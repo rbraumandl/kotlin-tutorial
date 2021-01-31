@@ -4,3 +4,12 @@
 
 ** Einsatzgebiete
 
+** Ausdrücke
+
+** Anweisungen
+
+** Datenstrukturen
+
+** Vergleich zu Java
+
+** Vergleich zu TypeScript
