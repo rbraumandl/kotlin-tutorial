@@ -1,0 +1,11 @@
+* The Start
+
+#+BEGIN_SRC kotlin :exports both
+(1..100).filter {it % 19 == 0}.reduce {a,b -> a + b}
+#+END_SRC
+
+#+RESULTS:
+: res0: kotlin.Int = 285
+: res1: kotlin.String = >>> 
+
+
