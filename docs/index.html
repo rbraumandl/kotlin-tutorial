@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2021-02-01 Mo 20:21 -->
+<!-- 2021-02-13 Sa 13:45 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>&lrm;</title>
@@ -242,24 +242,211 @@ for the JavaScript code in this tag.
 </head>
 <body>
 <div id="content">
-<div id="outline-container-org8ba846c" class="outline-2">
-<h2 id="org8ba846c">The Start</h2>
-<div class="outline-text-2" id="text-org8ba846c">
+<div id="outline-container-org67265db" class="outline-2">
+<h2 id="org67265db">Die Programmiersprache Kotlin</h2>
+<div class="outline-text-2" id="text-org67265db">
+<p>
+Die Programmiersprache Kotlin wurde von JetBrains im Jahre 2011 vorgestellt.
+Die Hauptentwicklung findet in Sankt Petersburg statt und der Name Kotlin stammt
+von einer Insel, die vor Sankt Petersburg liegt.
+</p>
+
+<p>
+Die Entwickler von Kotlin hatten die Programmiersprache Scala
+bezüglich den Programmiersprachen-Features im Blick, wobei Ihnen aber die
+Geschwindigkeit des Scala Compilers zu gering und die Kompatibilität
+zu Java nicht ausreichend genug waren. Kotlin ist daher keine kleine
+Programmiersprache, da versucht wird, möglicht viele Features von Scala
+zu realisieren, aber trotzdem kompatibler zu Java zu sein. Das führt zu
+relativ vielen Kompromissen und geringerer Orthogonalität bei der Nutzung
+von Programmiersprachenkonstrukten. 
+</p>
+
+<p>
+Kotlin ist also eher in der Tradition der Programmiersprachen von
+Anders Hejlberg (Turbo Pascal, Delphi, C#, Typescript) zu sehen, die
+eher pragmatisch als theoretisch fundiert und minimalistisch
+auftreten.
+</p>
+
+<p>
+Wie schon von Java und vor allem Scala bekannt, ist Kotlin eine
+objekt-orientierte Programmiersprache, die verschiedene Anleihen aus
+den funktionalen Programmiersprachen nimmt.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org11468a8" class="outline-2">
+<h2 id="org11468a8">Zielsetzung</h2>
+<div class="outline-text-2" id="text-org11468a8">
+<p>
+In diesem Tutorial werden wir daher definitiv nicht alle Details der
+Sprache vorstellen, sondern versuchen neben dem notwendigen Grundstock
+die Features zu vermitteln, die Kotlin auszeichnen und die
+unterschiedlich zu Java sind. Wir werden uns auch nur das Java Backend
+Einsatzszenario von Kotlin ansehen.
+</p>
+
+<p>
+Die vollständige Definition der Progammiersprache ist auf der
+Hauptseite der Programmiersprache zu finden:
+<a href="https://kotlinlang.org/">Kotlin Hauptseite</a>
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgbf8e71c" class="outline-2">
+<h2 id="orgbf8e71c">Erste Versuche auf der Kommandozeile</h2>
+<div class="outline-text-2" id="text-orgbf8e71c">
+<p>
+Das Paket mit dem Kommandozeilen Compiler ist ebenfalls vom
+<a href="https://kotlinlang.org/docs/tutorials/command-line.html">Kotlin Webauftritt</a> zu beziehen.
+</p>
+
+<p>
+Wie auch Java seit Java 9 bietet auch Kotlin die Möglichkeit einfache
+Programmkonstrukte in der Kotlin Shell auszuprobieren. 
+</p>
+
+<p>
+Ein minimales und traditionsreiches, erstes Kotlin Programm sieht so
+aus:
+Im Gegensatz zu Java gibt es in Kotlin top-level Funktionen und die
+Funktion <code>main()</code> als ein möglicher Einstiegspunkt eines jeden Kotlin
+Programms ist eine solche Funktion. Diesen Code kann man auch einfach
+in die Kotlin Shell kopieren und dann aufrufen.
+</p>
+
+<pre class="example">
+&gt;&gt;&gt; fun main() {
+...     println("Hello world")
+... }
+&gt;&gt;&gt; main()
+Hello world
+</pre>
+
+
+<p>
+Wenn wir diesen Code in der Datei HelloWorld.kt abspeichern und dann
+den Compiler folgendermaßen aufrufen:
+</p>
 <div class="org-src-container">
-<pre class="src src-kotlin">(1..100).filter {it % 19 == 0}.reduce {a,b -&gt; a + b}
+<pre class="src src-sh">&gt; kotlinc HelloWorld.kt 
+</pre>
+</div>
+<p>
+sehen wir, dass eine Java Class Datei und ein Meta-Inf Verzeichnis mit
+der Datei main.kotlin.module erzeugt wurde:
+</p>
+<pre class="example">
+.:
+HelloWorld.kt  HelloWorldKt.class  META-INF
+
+./META-INF:
+main.kotlin_module
+</pre>
+<p>
+Die Datei <code>main.kotlin_module</code> ist dabei ein Hilfskonstrukt, das dem
+Kotlin Compiler hilft, Aufrufe von top-level Funktionen beim Linken
+auszulösen. Wir müssen uns nicht weiter um diese Datei kümmern.
+</p>
+
+<p>
+Ein Dekompilieren der Class Datei mit javap zeigt, dass aus
+Kompatibilitätsgründen mit Java auch die klassische <code>public static void
+main(String[] args)</code> Methode erzeugt worden ist. 
+</p>
+<pre class="example">
+&gt; javap HelloWorldKt.class 
+
+Compiled from "HelloWorld.kt"
+public final class HelloWorldKt {
+  public static final void main();
+  public static void main(java.lang.String[]);
+}
+</pre>
+<p>
+Diese ist wegen der Nutzung des Java Laufzeitsystem notwendig und wird
+genutzt, um die Methode <code>void main()</code> aufzurufen, die für die
+top-level <code>main()</code> Funktion erzeugt wurde. Aufgerufen wird das
+Programm mit dem Java Interpreter und bei diesem Aufruf wird natürlich die
+<code>void main(String[] args)</code> Methode aufgerufen:
+</p>
+<div class="org-src-container">
+<pre class="src src-sh">java HelloWorldKt
+</pre>
+</div>
+<p>
+Wir sehen im Aufruf und auch der dekompilierten Klasse, dass die
+Klasse <code>HelloWorldKt</code> im Java ByteCode erzeugt wurde. Diese Klassen,
+deren Namen sich ergeben aus dem Dateinamen und dem Suffix Kt werden
+genutzt, um den Code der top-level Kotlin Funktionen aufzunehmen.
+</p>
+
+<p>
+Es kann auch ganz klassisch die main Methode von Java in Kotlin
+genutzt werden. 
+</p>
+<div class="org-src-container">
+<pre class="src src-kotlin">
+fun main(args: Array&lt;String&gt;) {
+    println(args.contentToString())
+}
+
+main(arrayOf("Eins","Zwei"))
 </pre>
 </div>
 
 <pre class="example">
-res4: kotlin.Int = 285
-res5: kotlin.String = &gt;&gt;&gt; 
+[Eins, Zwei]
+res11: kotlin.String = &gt;&gt;&gt; 
+</pre>
+
+
+<p>
+Wenn man jetzt versucht, eine Kotlin Datei mit der klassischen main
+Methode zu kompilieren und per Java Interpreter auszuführen, wird man
+eine Fehlermeldung erhalten, obwohl das Beispiel in der Kotlin Shell funktioniert:
+</p>
+<pre class="example">
+&gt; java HelloWorldKt
+Exception in thread "main" java.lang.NoClassDefFoundError: kotlin/jvm/internal/Intrinsics
+	at HelloWorldKt.main(HelloWorld.kt)
+Caused by: java.lang.ClassNotFoundException: kotlin.jvm.internal.Intrinsics
+	at java.base/jdk.internal.loader.BuiltinClassLoader.loadClass(BuiltinClassLoader.java:581)
+	at java.base/jdk.internal.loader.ClassLoaders$AppClassLoader.loadClass(ClassLoaders.java:178)
+	at java.base/java.lang.ClassLoader.loadClass(ClassLoader.java:522)
+	... 1 more
+
+</pre>
+<p>
+Grund dafür ist, dass Kotlin eine eigene Laufzeitbibliothek besitzt,
+die wir im Programm durch die Nutzung der <code>Array</code> Klasse referenzieren,
+aber das Java Laufzeitsystem diese Bibliothek im Normalfall nicht
+kennt. Ein einfacher Weg das Problem zu umgehen, ist die Nutzung des
+Programms kotlin, das im Kommandozeilen Paket von Kotlin enthalten ist
+und die Einbindung des Laufzeitsystems übernimmt:
+</p>
+<pre class="example">
+&gt; kotlin HelloWorldKt
+[]
+</pre>
+<p>
+Eine andere Alternative für stand-alone Programme ist, das bauen einer
+Jar Datei, die das Laufzeitsystem von Kotlin enthält:
+</p>
+<pre class="example">
+&gt; kotlinc -include-runtime HelloWorld.kt -d HelloWorld.jar
+&gt; java -jar HelloWorld.jar 
+[]
 </pre>
 </div>
 </div>
 </div>
 <div id="postamble" class="status">
 <p class="author">Author: Reinhard Braumandl</p>
-<p class="date">Created: 2021-02-01 Mo 20:21</p>
+<p class="date">Created: 2021-02-13 Sa 13:45</p>
 <p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
 </body>
