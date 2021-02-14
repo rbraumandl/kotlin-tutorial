@@ -3,9 +3,12 @@
 Dieses Projekt enthält Emacs org-mode Dateien, deren Inhalte ein
 kleines Kotlin Tutorial darstellen. 
 
+Der HTML Export des Tutorial ist zugreifbar über [[https://rbraumandl.github.io/kotlin-tutorial/][GitHub Pages]]
+
 Informationen zu Kotlin sind zu finden unter:
 [[https://kotlinlang.org/][Kotlin Hauptseite]]
 
 Informationen zum Emacs org-mode sind zu finden unter:
+
 [[https://orgmode.org/][- Hauptseite zum org-mode]]
 - [[https://github.com/fniessen/refcard-org-mode][Tolle Zusammenfassung von F. Niessen zum org-mode]]
