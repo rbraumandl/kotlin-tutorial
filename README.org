@@ -9,6 +9,5 @@ Informationen zu Kotlin sind zu finden unter:
 [[https://kotlinlang.org/][Kotlin Hauptseite]]
 
 Informationen zum Emacs org-mode sind zu finden unter:
-
-[[https://orgmode.org/][ - Hauptseite zum org-mode]]
+ - [[https://orgmode.org/][Hauptseite zum org-mode]]
  - [[https://github.com/fniessen/refcard-org-mode][Tolle Zusammenfassung von F. Niessen zum org-mode]]
