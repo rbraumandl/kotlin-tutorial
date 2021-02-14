@@ -1,15 +1,11 @@
 * Kotlin Tutorial
 
-** Historie
+Dieses Projekt enthält Emacs org-mode Dateien, deren Inhalte ein
+kleines Kotlin Tutorial darstellen. 
 
-** Einsatzgebiete
+Informationen zu Kotlin sind zu finden unter:
+[[https://kotlinlang.org/][Kotlin Hauptseite]]
 
-** Ausdrücke
-
-** Anweisungen
-
-** Datenstrukturen
-
-** Vergleich zu Java
-
-** Vergleich zu TypeScript
+Informationen zum Emacs org-mode sind zu finden unter:
+[[https://orgmode.org/][- Hauptseite zum org-mode]]
+- [[https://github.com/fniessen/refcard-org-mode][Tolle Zusammenfassung von F. Niessen zum org-mode]]

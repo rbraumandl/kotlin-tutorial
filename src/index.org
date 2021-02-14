@@ -1,3 +1,12 @@
+#+TITLE:     Kotlin Tutorial
+#+AUTHOR:    Reinhard Braumandl
+#+DESCRIPTION: Ein kleines Tutorial zur Programmiersprache Kotlin
+#+KEYWORDS:  kotlin, tutorial
+#+LANGUAGE:  de
+#+OPTIONS:   toc:2
+#+OPTIONS: H:4
+#+SETUPFILE: https://fniessen.github.io/org-html-themes/org/theme-bigblow.setup
+
 * Die Programmiersprache Kotlin
 
 Die Programmiersprache Kotlin wurde von JetBrains im Jahre 2011 vorgestellt.
@@ -13,34 +22,49 @@ zu realisieren, aber trotzdem kompatibler zu Java zu sein. Das führt zu
 relativ vielen Kompromissen und geringerer Orthogonalität bei der Nutzung
 von Programmiersprachenkonstrukten. 
 
-Kotlin ist also eher in der Tradition der Programmiersprachen von
-Anders Hejlberg (Turbo Pascal, Delphi, C#, Typescript) zu sehen, die
-eher pragmatisch als theoretisch fundiert und minimalistisch
-auftreten.
+Kotlin ist also eher in der Tradition einer Reihe von aktuellen
+Programmiersprachen zu sehen, die eher pragmatisch als theoretisch
+fundiert und minimalistisch auftreten. Kehrseite der Medaille ist dann
+meist, dass die von diesen Programmiersprachen unterstützten
+Konstrukte im Laufe der Enwicklung immer weiter ausufern.
 
-Wie schon von Java und vor allem Scala bekannt, ist Kotlin eine
-objekt-orientierte Programmiersprache, die verschiedene Anleihen aus
-den funktionalen Programmiersprachen nimmt.
+Wie schon von neueren Versionen von Java und vor allem Scala bekannt,
+ist Kotlin eine objekt-orientierte Programmiersprache, die
+verschiedene Anleihen aus den funktionalen Programmiersprachen nimmt.
 
 * Zielsetzung
 
-In diesem Tutorial werden wir daher definitiv nicht alle Details der
-Sprache vorstellen, sondern versuchen neben dem notwendigen Grundstock
+In diesem Tutorial werden wir definitiv nicht alle Details der Sprache
+Kotlin vorstellen, sondern versuchen neben dem notwendigen Grundstock
 die Features zu vermitteln, die Kotlin auszeichnen und die
 unterschiedlich zu Java sind. Wir werden uns auch nur das Java Backend
 Einsatzszenario von Kotlin ansehen.
 
-Die vollständige Definition der Progammiersprache ist auf der
-Hauptseite der Programmiersprache zu finden:
+Die vollständige Definition der Progammiersprache ist auf deren
+Hauptseite im Web zu finden:
 [[https://kotlinlang.org/][Kotlin Hauptseite]]
 
 * Erste Versuche auf der Kommandozeile
 
-Das Paket mit dem Kommandozeilen Compiler ist ebenfalls vom
-[[https://kotlinlang.org/docs/tutorials/command-line.html][Kotlin Webauftritt]] zu beziehen.
+Wir starten das Kennenlernen mit der Programmiersprache Kotlin auf
+Kommandozeilenebene und nicht gleich in der für Kotlin prädestinierten
+IDE IntelliJ. Hierdurch bekommt man eher ein Gefühlt dafür, wie die
+Integration mit der Java Plattform realisiert ist - das zumindest ist
+unsere Meinung.
 
-Wie auch Java seit Java 9 bietet auch Kotlin die Möglichkeit einfache
-Programmkonstrukte in der Kotlin Shell auszuprobieren. 
+Wir nutzen dabei im folgenden eine Linux Installation, um die
+Beispiele durchzuspielen. In den Beispielen zeigt der Prompt ~>~ den
+Bash Prompt (Linux Shell) an und ~>>>~ den Prompt der Kotlin Shell.
+
+Hierzu müssen wir auf dem Computer des Lesers zunächst das separat
+erhältliche Paket mit den Kotlin Kommandozeilen Tools installieren.
+Das Paket mit dem Kommandozeilen Compiler ist vom [[https://kotlinlang.org/docs/tutorials/command-line.html][Kotlin Webauftritt]]
+zu beziehen, wobei auch eine Anleitung für die Installation gegeben
+ist. Das Prozedere der Installation sei als dem Leser überlassen.
+
+Wie auch Java seit Version 9 bietet auch Kotlin die Möglichkeit
+Programmkonstrukte in der Kotlin Shell auszuprobieren. Der Aufruf der
+Kotlin Shell erfolgt einfach 
 
 Ein minimales und traditionsreiches, erstes Kotlin Programm sieht so
 aus:
@@ -50,7 +74,7 @@ fun main() {
 }
 #+end_src
 Im Gegensatz zu Java gibt es in Kotlin top-level Funktionen und die
-Funktion ~main()~ als ein möglicher Einstiegspunkt eines jeden Kotlin
+Funktion ~main()~ als ein möglicher Einstiegspunkt eines Kotlin
 Programms ist eine solche Funktion. Diesen Code kann man auch einfach
 in die Kotlin Shell kopieren und dann aufrufen.
 
@@ -142,13 +166,63 @@ kennt. Ein einfacher Weg das Problem zu umgehen, ist die Nutzung des
 Programms kotlin, das im Kommandozeilen Paket von Kotlin enthalten ist
 und die Einbindung des Laufzeitsystems übernimmt:
 #+begin_example
-> kotlin HelloWorldKt
-[]
+> kotlin HelloWorldKt Eins Zwei
+[Eins, Zwei]
 #+end_example
-Eine andere Alternative für stand-alone Programme ist, das bauen einer
+Es kann natürlich auch der Java Interpreter genutzt werden, wenn man
+die passende Bibliothek aus dem Kotlin Paket mit einbindet:
+#+begin_example
+> java -classpath ~/programme/kotlinc/lib/kotlin-stdlib.jar:. HelloWorldKt Eins Zwei
+[Eins, Zwei]
+#+end_example
+
+Eine andere Alternative für stand-alone Programme ist, das Bauen einer
 Jar Datei, die das Laufzeitsystem von Kotlin enthält:
 #+begin_example
 > kotlinc -include-runtime HelloWorld.kt -d HelloWorld.jar
-> java -jar HelloWorld.jar 
-[]
+> java -jar HelloWorld.jar Eins Zwei
+[Eins, Zwei]
 #+end_example
+An der Größe der Jar Datei von etwa 1,5 MByte erkennt man gleich, dass
+hier etwas mehr Code als der aus dem Beispiel mit abgelegt wurde. Es
+sollte klar sein, dass die ~-include-runtime~ Option nicht bei der
+Erstellung von Bibliotheken genutzt werden sollte, da die Runtime von
+Kotlin jeweils nur im Code von lauffähigen Programmen benötigt wird
+und wie oben gezeigt auch über die Referenz der passenden Runtime
+Bibliothek eingebunden werden kann.
+
+* Elementare Datentypen und Ausdrücke
+
+** Elementare Datentypen
+
+** Ausdrücke
+
+* Grundkonstruktion von Programmen
+
+** Top Level Konstrukte der Programmiersprache
+
+
+*** Funktionen
+
+*** Properties	
+
+*** Interfaces
+
+*** Klassen
+
+
+** Organisation von Source Code
+
+In diesem Abschnitt beschäftigen wir uns mit der Frage, wie man die
+zuvor erwähnten top-level Sprachkonstrukte organisiert, um eine
+strukturierte Programmentwicklung zu ermöglichen.
+
+*** Modularisierung mittels Packages
+
+*** Aufbau einer Source Code Datei
+
+*** Organisation der Dateiablage
+
+*** Sichtbarkeitsregeln
+
+
