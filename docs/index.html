@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="de" xml:lang="de">
 <head>
-<!-- 2021-02-14 So 19:23 -->
+<!-- 2021-02-25 Do 21:31 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Kotlin Tutorial</title>
@@ -266,12 +266,14 @@ for the JavaScript code in this tag.
 <li><a href="#orgbf8e71c">Erste Versuche auf der Kommandozeile</a></li>
 <li><a href="#org77668d4">Elementare Datentypen und Ausdrücke</a>
 <ul>
+<li><a href="#orged91158">Lokale Variablen</a></li>
 <li><a href="#org5988f0d">Elementare Datentypen</a></li>
 <li><a href="#orge8900e3">Ausdrücke</a></li>
 </ul>
 </li>
 <li><a href="#org77d0243">Grundkonstruktion von Programmen</a>
 <ul>
+<li><a href="#orgfd21f64">Kein static Modifier und die Folgen</a></li>
 <li><a href="#org464f89f">Top Level Konstrukte der Programmiersprache</a></li>
 <li><a href="#org7d00225">Organisation von Source Code</a></li>
 </ul>
@@ -328,9 +330,15 @@ Einsatzszenario von Kotlin ansehen.
 </p>
 
 <p>
-Die vollständige Definition der Progammiersprache ist auf deren
-Hauptseite im Web zu finden:
-<a href="https://kotlinlang.org/">Kotlin Hauptseite</a>
+Die Beschreibung der Progammiersprache Kotlin ist auf deren Hauptseite
+im Web zu finden: <a href="https://kotlinlang.org/">Kotlin Hauptseite</a> 
+</p>
+
+<p>
+Die relativ formale <a href="https://kotlinlang.org/spec/introduction.html">Definition der Sprache</a> gibt im Vergleich zum
+größten Teil dieses Webauftritts die präzisere Definition der Sprache
+wieder. Bei Zweifeln über bestimmte Konstrukte sollte also die
+Sprachdefinition zu Rate gezogen werden.
 </p>
 </div>
 </div>
@@ -447,11 +455,11 @@ genutzt werden.
 </p>
 <div class="org-src-container">
 <pre class="src src-kotlin">
-fun main(args: Array&lt;String&gt;) {
+<span style="color: #a020f0;">fun</span> <span style="color: #0000ff;">main</span>(args: <span style="color: #228b22;">Array&lt;String&gt;</span>) {
     println(args.contentToString())
 }
 
-main(arrayOf("Eins","Zwei"))
+main(arrayOf(<span style="color: #8b2252;">"Eins"</span>,<span style="color: #8b2252;">"Zwei"</span>))
 </pre>
 </div>
 
@@ -521,10 +529,231 @@ Bibliothek eingebunden werden kann.
 <div id="outline-container-org77668d4" class="outline-2">
 <h2 id="org77668d4">Elementare Datentypen und Ausdrücke</h2>
 <div class="outline-text-2" id="text-org77668d4">
+<p>
+Bevor wir komplexere Konstrukte von Kotlin ansehen, müssen wir einige
+Grundzüge der Programmiersprache betrachten. 
+</p>
 </div>
+
+<div id="outline-container-orged91158" class="outline-3">
+<h3 id="orged91158">Lokale Variablen</h3>
+<div class="outline-text-3" id="text-orged91158">
+<p>
+Wir betrachten hier nur lokale Variablen in Code Blöcken wie z.B.
+in Funktionen. Sogenannte Properties die analog definiert werden und
+auf top-level Ebene und in Klassen verwendet werden können, haben
+erweiterte Möglichkeiten und werden später betrachtet.
+</p>
+
+<p>
+Das Schlüsselwort <code>var</code> leitet eine Variablendeklaration ein. Wie man
+es erwartet ist der Wert einer solchen Variable änderbar. In den
+folgenden Beispielen verwenden wir den Typ <code>Int</code>, der erwartungsgemäß
+Integer Zahlen repräsentiert.
+</p>
+<div class="org-src-container">
+<pre class="src src-kotlin"><span style="color: #a020f0;">fun</span> <span style="color: #0000ff;">main</span>() {
+  <span style="color: #a020f0;">var</span> <span style="color: #a0522d;">a</span>: <span style="color: #228b22;">Int</span> = 1    <span style="color: #b22222;">// </span><span style="color: #b22222;">Deklaration mit Typangabe und Initialisierung</span>
+  <span style="color: #a020f0;">var</span> <span style="color: #a0522d;">b</span> = 2         <span style="color: #b22222;">// </span><span style="color: #b22222;">Typ Inferenz </span>
+  <span style="color: #a020f0;">var</span> <span style="color: #a0522d;">c</span>: <span style="color: #228b22;">Int</span>        <span style="color: #b22222;">// </span><span style="color: #b22222;">Deklaration ohne Initialisierung</span>
+  c = 3             <span style="color: #b22222;">// </span><span style="color: #b22222;">sp&#228;tere Initialisierung</span>
+  println(<span style="color: #8b2252;">"a = ${</span>a<span style="color: #8b2252;">}, b = ${</span>b<span style="color: #8b2252;">}, c = ${</span>c<span style="color: #8b2252;">}"</span>) 
+  a++
+  b++
+  c++
+  println(<span style="color: #8b2252;">"a = ${</span>a<span style="color: #8b2252;">}, b = ${</span>b<span style="color: #8b2252;">}, c = ${</span>c<span style="color: #8b2252;">}"</span>)
+}
+
+main()
+</pre>
+</div>
+
+<pre class="example">
+a = 1, b = 2, c = 3
+a = 2, b = 3, c = 4
+</pre>
+
+
+<p>
+Zunächst muss man festhalten, dass in Kotlin die Typen mit einem
+Doppelpunkt abgetrennt nach den Bezeichnern stehen. Das gilt dann auch
+für Rückgabewerte von Funktionen, wie wir später sehen werden.
+</p>
+
+<p>
+Wir sehen zu Beginn der <code>main</code> Funktion die gleichzeitige Deklaration
+und Zuweisung der Variablen <code>a</code>, die Deklaration und Initialisierung
+der Variablen <code>b</code> ohne Typangabe und die Deklaration der mit Typangabe
+der Variable <code>c</code> mit späterer Initialierung der Variablen. 
+</p>
+
+<p>
+Bei der Variablen <code>b</code> wurde der Typ <code>Int</code> per Typ Inferenz von Kotlin
+selber bestimmt, ohne dass der Programmierer dies angeben musste. 
+</p>
+
+<p>
+Anhand der Nutzung der top-level Funktion <code>println</code> können wir auch
+sehen, dass in Kotlin Strings standardmäßig Variablen Interpolation
+erlauben.
+</p>
+
+<p>
+Das Schlüsselwort <code>val</code> leitet eine einmal beschreibbare Variable
+ein. Also eher vergleichbar mit einer Konstanten. Es gibt auch noch
+das Schlüsselwort <code>const</code>, das im Zusammenspiel mit einer <code>val</code>
+Variablen eingesetzt werden kann und eine sofortige Zuweisung
+erzwingt, worauf wir aber nicht weiter eingehen, da <code>const</code> recht
+inkonsistent nur an wenigen Stellen verwendet werden kann.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-kotlin"><span style="color: #a020f0;">fun</span> <span style="color: #0000ff;">main</span>() {
+  <span style="color: #a020f0;">val</span> <span style="color: #a0522d;">a</span>: <span style="color: #228b22;">Int</span> = 1
+  <span style="color: #a020f0;">val</span> <span style="color: #a0522d;">b</span> = 2
+  <span style="color: #a020f0;">val</span> <span style="color: #a0522d;">c</span>: <span style="color: #228b22;">Int</span>      <span style="color: #b22222;">// </span><span style="color: #b22222;">Initialisierung kann auch bei val </span><span style="color: #a0522d;">verz&#246;gert</span><span style="color: #b22222;"> sein</span>
+  c = 3
+
+  println(<span style="color: #8b2252;">"a = ${</span>a<span style="color: #8b2252;">}, b = ${</span>b<span style="color: #8b2252;">}, c = ${</span>c<span style="color: #8b2252;">}"</span>)
+  <span style="color: #b22222;">// </span><span style="color: #b22222;">c = 4           nicht erlaubt, Compiler meldet Fehler!!</span>
+}
+
+main()
+</pre>
+</div>
+
+<pre class="example">
+a = 1, b = 2, c = 3
+</pre>
+</div>
+</div>
+
+
+
 <div id="outline-container-org5988f0d" class="outline-3">
 <h3 id="org5988f0d">Elementare Datentypen</h3>
+<div class="outline-text-3" id="text-org5988f0d">
+<p>
+Anders als in Java werden in Kotlin nur Objekttypen verwendet, auch
+für alle elementaren Datentypen. Als Konsequenz sind alle Operationen
+auf den Datentypen per Member-Funktion erreichbar, wobei die
+Operationen größtenteils den aus Java bekannten gleichen.
+</p>
+
+<p>
+Intern verwendet Kotlin aus Performancegründen teilweise die
+primitiven Datentypen der Java VM, aber dies ist weitestgehend
+unsichtbar für den Programmierer.
+</p>
 </div>
+
+
+<div id="outline-container-orgef7c29e" class="outline-4">
+<h4 id="orgef7c29e">Ganzzahlige Datentypen</h4>
+<div class="outline-text-4" id="text-orgef7c29e">
+<p>
+Es gibt die von Java bekannten vorzeichenbehafteten Typen (signed integers)
+</p>
+<ul class="org-ul">
+<li>Byte (8 Bit)</li>
+<li>Short (16 Bit)</li>
+<li>Int (32 Bit)</li>
+<li>Long (64 Bit)</li>
+</ul>
+
+<div class="note">
+<p>
+In den neueren Version von Kotlin ist experimenteller Support für
+unsigned integers integriert.
+</p>
+
+</div>
+
+<div class="org-src-container">
+<pre class="src src-kotlin"><span style="color: #a020f0;">val</span> <span style="color: #a0522d;">byte</span>: <span style="color: #228b22;">Byte</span> = 1 
+<span style="color: #a020f0;">val</span> <span style="color: #a0522d;">short</span>: <span style="color: #228b22;">Short</span> = 128
+<span style="color: #a020f0;">val</span> <span style="color: #a0522d;">int</span>: <span style="color: #228b22;">Int</span> = 32768
+<span style="color: #a020f0;">val</span> <span style="color: #a0522d;">long</span>: <span style="color: #228b22;">Long</span> = 2147483647
+<span style="color: #a020f0;">val</span> <span style="color: #a0522d;">int1</span> = 10 <span style="color: #b22222;">// </span><span style="color: #b22222;">Int als default hergeleiteter Typ</span>
+<span style="color: #a020f0;">val</span> <span style="color: #a0522d;">long1</span> = 2147483647 <span style="color: #b22222;">// </span><span style="color: #b22222;">long, da Wertebereich Int &#252;berschreitet</span>
+<span style="color: #a020f0;">val</span> <span style="color: #a0522d;">long2</span> = 8L <span style="color: #b22222;">// </span><span style="color: #b22222;">per L Suffix wird Long als Typ erzwungen</span>
+
+long2.toString(2) <span style="color: #b22222;">// </span><span style="color: #b22222;">Zahlen sind Objekte, 8 wird als Zahl zur Basis 2 ausgegeben</span>
+</pre>
+</div>
+
+<pre class="example">
+kotlin.String = 1000
+</pre>
+</div>
+</div>
+
+<div id="outline-container-org1d88be0" class="outline-4">
+<h4 id="org1d88be0">Gleitkommazahlen Datentypen</h4>
+<div class="outline-text-4" id="text-org1d88be0">
+<p>
+Analog zum vorherigen Abschnitt gibt es auch bei den Gleitkommazahlen
+die beiden von Java bekannten Typen <code>Float</code> und <code>Double</code>.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-kotlin"><span style="color: #a020f0;">val</span> <span style="color: #a0522d;">double</span> : <span style="color: #228b22;">Double</span> = 0.8
+<span style="color: #a020f0;">val</span> <span style="color: #a0522d;">pi</span> = 3.14
+<span style="color: #a020f0;">val</span> <span style="color: #a0522d;">pif</span> = 6.28f <span style="color: #b22222;">// </span><span style="color: #b22222;">Suffix f f&#252;hrt zu Float Type anstatt zum default von Double</span>
+println(<span style="color: #8b2252;">"${</span>pi.hashCode()<span style="color: #8b2252;">} ${</span>pif.hashCode()<span style="color: #8b2252;">}"</span>)
+</pre>
+</div>
+
+<pre class="example">
+300063655 1086911939
+</pre>
+</div>
+</div>
+
+<div id="outline-container-org57a6cd8" class="outline-4">
+<h4 id="org57a6cd8">Booleans</h4>
+<div class="outline-text-4" id="text-org57a6cd8">
+<p>
+Auch hier gibt es keine großen Überraschungen.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-kotlin"><span style="color: #a020f0;">val</span> <span style="color: #a0522d;">myTrue</span>: <span style="color: #228b22;">Boolean</span> = <span style="color: #008b8b;">true</span>
+<span style="color: #a020f0;">val</span> <span style="color: #a0522d;">myFalse</span>: <span style="color: #228b22;">Boolean</span> = <span style="color: #008b8b;">false</span>
+
+println(myTrue || myFalse)
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgc2fa040" class="outline-4">
+<h4 id="orgc2fa040">Zeichen/Characters</h4>
+<div class="outline-text-4" id="text-orgc2fa040">
+<p>
+Hier gibt es ebenfalls keine Überraschungen im Vergleich zu Java.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-kotlin"><span style="color: #a020f0;">val</span> <span style="color: #a0522d;">charA</span>: <span style="color: #228b22;">Char</span> = <span style="color: #8b2252;">'a'</span>
+<span style="color: #a020f0;">val</span> <span style="color: #a0522d;">charSpecial</span> = <span style="color: #8b2252;">'\n'</span>
+<span style="color: #a020f0;">val</span> <span style="color: #a0522d;">charB</span>: <span style="color: #228b22;">Char</span> = <span style="color: #8b2252;">'b'</span>
+println(<span style="color: #8b2252;">"${</span>charA<span style="color: #8b2252;">} ${</span>charSpecial<span style="color: #8b2252;">} ${</span>charB<span style="color: #8b2252;">}"</span>)
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-orgf968a2a" class="outline-4">
+<h4 id="orgf968a2a">Zeichenketten/Strings</h4>
+</div>
+
+<div id="outline-container-org484567e" class="outline-4">
+<h4 id="org484567e">Arrays</h4>
+</div>
+</div>
+
 
 <div id="outline-container-orge8900e3" class="outline-3">
 <h3 id="orge8900e3">Ausdrücke</h3>
@@ -535,17 +764,51 @@ Bibliothek eingebunden werden kann.
 <h2 id="org77d0243">Grundkonstruktion von Programmen</h2>
 <div class="outline-text-2" id="text-org77d0243">
 </div>
+<div id="outline-container-orgfd21f64" class="outline-3">
+<h3 id="orgfd21f64">Kein static Modifier und die Folgen</h3>
+<div class="outline-text-3" id="text-orgfd21f64">
+<p>
+Kotlin unterstützt auf Sprachenebene nicht den Modifier <code>static</code>, der
+in Java zur Zuordnung von Variablen und Methoden zu Klassen genutzt
+werden kann. Dies hat für einige Konstrukte in Kotlin gesorgt, um
+Funktionalitäten nachzubilden, für die in Java <code>static</code> verwendet
+wurde. Die Details dieser Konstrukte sehen wir uns später an.
+</p>
+
+<ul class="org-ul">
+<li>Statt static Member Variablen gibt es top-level Properties.</li>
+<li>Statt static Methoden gibt es top-level Funktionsdefinitionen.</li>
+<li>Für Singletons gibt es die Möglichkeit top-level Quasi-Klassen zu
+definieren, von denen genau ein Objekt existiert. Dieses Konstrukt
+wird auch einfach Object genannt.</li>
+<li>Um Objekten einer Klasse die Möglichkeit zu geben, um auf
+Klassenebene Strukturen und Funktionen zu nutzen, gibt es das
+Konstrukt <code>companion object</code>, das in einer Klasse definiert sein
+kann. Darüber kann man zum Beispiel ein Factory Method Pattern
+abbilden. Ein <code>companion object</code> ist also eine Art Singleton, das
+explizit einer Klasse zugeordnet ist.</li>
+</ul>
+</div>
+</div>
+
 <div id="outline-container-org464f89f" class="outline-3">
 <h3 id="org464f89f">Top Level Konstrukte der Programmiersprache</h3>
 <div class="outline-text-3" id="text-org464f89f">
 </div>
 <div id="outline-container-org6e31034" class="outline-4">
 <h4 id="org6e31034">Funktionen</h4>
+<div class="outline-text-4" id="text-org6e31034">
+<p>
+Die Parameter einer Funktion müssen explizit angegebene Typen haben.
+</p>
+</div>
 </div>
 
 <div id="outline-container-orgd1364c3" class="outline-4">
 <h4 id="orgd1364c3">Properties</h4>
 </div>
+
+
 
 <div id="outline-container-org7040771" class="outline-4">
 <h4 id="org7040771">Interfaces</h4>
@@ -553,9 +816,166 @@ Bibliothek eingebunden werden kann.
 
 <div id="outline-container-org2b43337" class="outline-4">
 <h4 id="org2b43337">Klassen</h4>
+<div class="outline-text-4" id="text-org2b43337">
+</div>
+<div id="outline-container-org58c06fb" class="outline-5">
+<h5 id="org58c06fb">Properties in Klassen</h5>
+<div class="outline-text-5" id="text-org58c06fb">
+<p>
+Properties in Klassen sind analog zu definieren wie top-level Properties.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-kotlin"><span style="color: #a020f0;">class</span> <span style="color: #228b22;">Test</span> {
+  <span style="color: #a020f0;">var</span> <span style="color: #a0522d;">test</span> : <span style="color: #228b22;">String</span> = <span style="color: #8b2252;">"Variabler Wert"</span>
+  <span style="color: #a020f0;">val</span> <span style="color: #a0522d;">rtest</span> = <span style="color: #8b2252;">"ReadOnly Wert mit type inference"</span>
+}
+
+<span style="color: #a020f0;">val</span> <span style="color: #a0522d;">t</span> = <span style="color: #228b22;">Test</span>()
+t.test + <span style="color: #8b2252;">" "</span> + t.rtest
+</pre>
+</div>
+
+<pre class="example">
+kotlin.String = Variabler Wert ReadOnly Wert mit type inference
+</pre>
+
+
+<p>
+Properties in Klassen können analog zu top-level Properties ihre
+default-Getter und -Setter überschreiben:
+</p>
+<div class="org-src-container">
+<pre class="src src-kotlin"><span style="color: #a020f0;">class</span> <span style="color: #228b22;">Test</span> {
+  <span style="color: #a020f0;">var</span> <span style="color: #a0522d;">test</span> : <span style="color: #228b22;">Int</span> = 2
+  <span style="color: #a020f0;">get</span>() = <span style="color: #a020f0;">field</span> + 1 <span style="color: #b22222;">// </span><span style="color: #b22222;">Nutzung des backing field</span>
+  <span style="color: #a020f0;">set</span>(value) {
+    <span style="color: #a020f0;">field</span> += value
+  }
+}
+<span style="color: #a020f0;">val</span> <span style="color: #a0522d;">t</span> = <span style="color: #228b22;">Test</span>()
+t.test = 2 <span style="color: #b22222;">// </span><span style="color: #b22222;">impliziter Call des Setter</span>
+t.test     <span style="color: #b22222;">// </span><span style="color: #b22222;">impliziter Call des Getter</span>
+</pre>
+</div>
+
+
+<pre class="example">
+kotlin.Int = 5
+</pre>
+
+
+<p>
+Man kann auch die Sichtbarkeit der Getter und Setter steuern:
+</p>
+<div class="org-src-container">
+<pre class="src src-kotlin"><span style="color: #a020f0;">class</span> <span style="color: #228b22;">Test</span> {
+  <span style="color: #a020f0;">var</span> <span style="color: #a0522d;">test</span> : <span style="color: #228b22;">Int</span> = 2
+  <span style="color: #a020f0;">get</span>() = <span style="color: #a020f0;">field</span> + 1 <span style="color: #b22222;">// </span><span style="color: #b22222;">Nutzung des backing field</span>
+  <span style="color: #a020f0;">private</span> <span style="color: #a020f0;">set</span> <span style="color: #b22222;">// </span><span style="color: #b22222;">auch ohne Implementierung nur f&#252;r die Sichtbarkeit</span>
+}
+<span style="color: #a020f0;">val</span> <span style="color: #a0522d;">t</span> = <span style="color: #228b22;">Test</span>()
+<span style="color: #b22222;">//</span><span style="color: #b22222;">t.test = 2 w&#252;rde jetzt einen Fehler ergeben</span>
+t.test     <span style="color: #b22222;">// </span><span style="color: #b22222;">impliziter Call des Getter</span>
+</pre>
+</div>
+
+<pre class="example">
+kotlin.Int = 3
+</pre>
 </div>
 </div>
 
+
+<div id="outline-container-org778ddc4" class="outline-5">
+<h5 id="org778ddc4">Konstruktoren</h5>
+<div class="outline-text-5" id="text-org778ddc4">
+<p>
+Über den sogenannten primary constructor kann man Klassen schön
+kompakt formulieren:
+</p>
+<div class="org-src-container">
+<pre class="src src-kotlin"><span style="color: #a020f0;">class</span> <span style="color: #228b22;">Test</span> (<span style="color: #a020f0;">var</span> <span style="color: #a0522d;">test</span> : <span style="color: #228b22;">Int</span>) { <span style="color: #b22222;">// </span><span style="color: #b22222;">Konstruktor Parameter und Property gleichzeitig definiert</span>
+}
+<span style="color: #a020f0;">val</span> <span style="color: #a0522d;">t</span> = <span style="color: #228b22;">Test</span>(2)
+t.test
+</pre>
+</div>
+
+<pre class="example">
+kotlin.Int = 2
+</pre>
+
+
+<p>
+Dieses Beispiel maximal länglich aber mit primary constructor wäre so zu formulieren:
+</p>
+<div class="org-src-container">
+<pre class="src src-kotlin"><span style="color: #a020f0;">class</span> <span style="color: #228b22;">Test</span> <span style="color: #a020f0;">constructor</span>(testparam : <span style="color: #228b22;">Int</span>) {
+  <span style="color: #a020f0;">var</span> <span style="color: #a0522d;">test</span> : <span style="color: #228b22;">Int</span> = testparam
+}
+<span style="color: #a020f0;">val</span> <span style="color: #a0522d;">t</span> = <span style="color: #228b22;">Test</span>(2)
+t.test
+</pre>
+</div>
+
+<pre class="example">
+kotlin.Int = 2
+</pre>
+
+
+<p>
+Ein secondary constructor muss den primary constructor immer aufrufen,
+damit der primary constructor bei Objektinitialisierung immer zuerst
+ausgeführt wird. Dies muss vor allen wegen initializer Blocks und
+Property Wertzuweisung passieren:
+</p>
+<div class="org-src-container">
+<pre class="src src-kotlin"><span style="color: #a020f0;">class</span> <span style="color: #228b22;">Test</span> <span style="color: #a020f0;">constructor</span>(testparam : <span style="color: #228b22;">Int</span>) {
+  <span style="color: #a020f0;">var</span> <span style="color: #a0522d;">test</span> : <span style="color: #228b22;">Int</span> = testparam
+  <span style="color: #a020f0;">var</span> <span style="color: #a0522d;">secTest</span> : <span style="color: #228b22;">Int</span> = 4
+
+  <span style="color: #a020f0;">constructor</span> (testparam: <span style="color: #228b22;">Int</span>, secparam : <span style="color: #228b22;">Int</span>) : <span style="color: #a020f0;">this</span>(testparam) {
+    secTest = secparam
+  }
+}
+<span style="color: #a020f0;">val</span> <span style="color: #a0522d;">t</span> = <span style="color: #228b22;">Test</span>(4,4)
+t.test + t.secTest
+</pre>
+</div>
+
+<pre class="example">
+kotlin.Int = 8
+</pre>
+
+
+<p>
+Falls kein primary constructor definiert wird, erzeugt Kotlin einen
+default primary constructor, welcher auch automatisch bei Aufruf eines
+secondary constructors ausgeführt wird:
+</p>
+<div class="org-src-container">
+<pre class="src src-kotlin"><span style="color: #a020f0;">class</span> <span style="color: #228b22;">Test</span> {
+  <span style="color: #a020f0;">var</span> <span style="color: #a0522d;">test</span> : <span style="color: #228b22;">Int</span>
+  <span style="color: #a020f0;">init</span> {
+    test = 8
+  }
+  <span style="color: #a020f0;">constructor</span> (testparam : <span style="color: #228b22;">Int</span>) {
+    test += testparam
+  }
+}
+<span style="color: #a020f0;">val</span> <span style="color: #a0522d;">t</span> = <span style="color: #228b22;">Test</span>(2)
+t.test
+</pre>
+</div>
+
+<pre class="example">
+kotlin.Int = 10
+</pre>
+</div>
+</div>
+</div>
+</div>
 
 <div id="outline-container-org7d00225" class="outline-3">
 <h3 id="org7d00225">Organisation von Source Code</h3>
@@ -567,9 +987,27 @@ strukturierte Programmentwicklung zu ermöglichen.
 </p>
 </div>
 
-<div id="outline-container-org548965e" class="outline-4">
-<h4 id="org548965e">Modularisierung mittels Packages</h4>
+<div id="outline-container-orgd94a6a8" class="outline-4">
+<h4 id="orgd94a6a8">Modularisierung</h4>
+<div class="outline-text-4" id="text-orgd94a6a8">
+<p>
+Bisher haben wir in den Beispielen keine Konstrukte zur
+Modularisierung von Code verwendet. Kotlin hat hierbei diese
+Möglichkeiten:
+</p>
+<ul class="org-ul">
+<li>Package</li>
+<li>Module</li>
+</ul>
+
+<p>
+Modules spielen eine Rolle bei der Sichtbarkeit von <code>internal</code>
+Deklarationen und ansonsten bei einigen Backends für den Kotlin
+Code. Wir werden dieses Konstrukt daher nicht weiter betrachten.
+</p>
 </div>
+</div>
+
 
 <div id="outline-container-org4965a55" class="outline-4">
 <h4 id="org4965a55">Aufbau einer Source Code Datei</h4>
@@ -587,7 +1025,7 @@ strukturierte Programmentwicklung zu ermöglichen.
 </div>
 <div id="postamble" class="status">
 <p class="author">Autor: Reinhard Braumandl</p>
-<p class="date">Created: 2021-02-14 So 19:23</p>
+<p class="date">Created: 2021-02-25 Do 21:31</p>
 <p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
 </body>

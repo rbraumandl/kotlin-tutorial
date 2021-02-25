@@ -40,9 +40,13 @@ die Features zu vermitteln, die Kotlin auszeichnen und die
 unterschiedlich zu Java sind. Wir werden uns auch nur das Java Backend
 Einsatzszenario von Kotlin ansehen.
 
-Die vollständige Definition der Progammiersprache ist auf deren
-Hauptseite im Web zu finden:
-[[https://kotlinlang.org/][Kotlin Hauptseite]]
+Die Beschreibung der Progammiersprache Kotlin ist auf deren Hauptseite
+im Web zu finden: [[https://kotlinlang.org/][Kotlin Hauptseite]] 
+
+Die relativ formale [[https://kotlinlang.org/spec/introduction.html][Definition der Sprache]] gibt im Vergleich zum
+größten Teil dieses Webauftritts die präzisere Definition der Sprache
+wieder. Bei Zweifeln über bestimmte Konstrukte sollte also die
+Sprachdefinition zu Rate gezogen werden.
 
 * Erste Versuche auf der Kommandozeile
 
@@ -193,23 +197,323 @@ Bibliothek eingebunden werden kann.
 
 * Elementare Datentypen und Ausdrücke
 
+Bevor wir komplexere Konstrukte von Kotlin ansehen, müssen wir einige
+Grundzüge der Programmiersprache betrachten. 
+
+** Lokale Variablen
+
+Wir betrachten hier nur lokale Variablen in Code Blöcken wie z.B.
+in Funktionen. Sogenannte Properties die analog definiert werden und
+auf top-level Ebene und in Klassen verwendet werden können, haben
+erweiterte Möglichkeiten und werden später betrachtet.
+
+Das Schlüsselwort ~var~ leitet eine Variablendeklaration ein. Wie man
+es erwartet ist der Wert einer solchen Variable änderbar. In den
+folgenden Beispielen verwenden wir den Typ ~Int~, der erwartungsgemäß
+Integer Zahlen repräsentiert.
+#+begin_src kotlin :exports both
+fun main() {
+  var a: Int = 1    // Deklaration mit Typangabe und Initialisierung
+  var b = 2         // Typ Inferenz 
+  var c: Int        // Deklaration ohne Initialisierung
+  c = 3             // spätere Initialisierung
+  println("a = ${a}, b = ${b}, c = ${c}") 
+  a++
+  b++
+  c++
+  println("a = ${a}, b = ${b}, c = ${c}")
+}
+
+main()
+#+end_src
+
+#+RESULTS:
+: a = 1, b = 2, c = 3
+: a = 2, b = 3, c = 4
+
+Zunächst muss man festhalten, dass in Kotlin die Typen mit einem
+Doppelpunkt abgetrennt nach den Bezeichnern stehen. Das gilt dann auch
+für Rückgabewerte von Funktionen, wie wir später sehen werden.
+
+Wir sehen zu Beginn der ~main~ Funktion die gleichzeitige Deklaration
+und Zuweisung der Variablen ~a~, die Deklaration und Initialisierung
+der Variablen ~b~ ohne Typangabe und die Deklaration der mit Typangabe
+der Variable ~c~ mit späterer Initialierung der Variablen. 
+
+Bei der Variablen ~b~ wurde der Typ ~Int~ per Typ Inferenz von Kotlin
+selber bestimmt, ohne dass der Programmierer dies angeben musste. 
+
+Anhand der Nutzung der top-level Funktion ~println~ können wir auch
+sehen, dass in Kotlin Strings standardmäßig Variablen Interpolation
+erlauben.
+
+Das Schlüsselwort ~val~ leitet eine einmal beschreibbare Variable
+ein. Also eher vergleichbar mit einer Konstanten. Es gibt auch noch
+das Schlüsselwort ~const~, das im Zusammenspiel mit einer ~val~
+Variablen eingesetzt werden kann und eine sofortige Zuweisung
+erzwingt, worauf wir aber nicht weiter eingehen, da ~const~ recht
+inkonsistent nur an wenigen Stellen verwendet werden kann.
+
+#+begin_src kotlin :exports both
+fun main() {
+  val a: Int = 1
+  val b = 2
+  val c: Int      // Initialisierung kann auch bei val verzögert sein
+  c = 3
+  
+  println("a = ${a}, b = ${b}, c = ${c}")
+  // c = 4           nicht erlaubt, Compiler meldet Fehler!!
+}
+
+main()
+#+end_src
+
+#+RESULTS:
+: a = 1, b = 2, c = 3
+
+
+
 ** Elementare Datentypen
+
+Anders als in Java werden in Kotlin nur Objekttypen verwendet, auch
+für alle elementaren Datentypen. Als Konsequenz sind alle Operationen
+auf den Datentypen per Member-Funktion erreichbar, wobei die
+Operationen größtenteils den aus Java bekannten gleichen.
+
+Intern verwendet Kotlin aus Performancegründen teilweise die
+primitiven Datentypen der Java VM, aber dies ist weitestgehend
+unsichtbar für den Programmierer.
+
+
+*** Ganzzahlige Datentypen
+
+Es gibt die von Java bekannten vorzeichenbehafteten Typen (signed integers)
+- Byte (8 Bit)
+- Short (16 Bit)
+- Int (32 Bit)
+- Long (64 Bit)
+
+#+begin_note
+In den neueren Version von Kotlin ist experimenteller Support für
+unsigned integers integriert.
+#+end_note
+
+#+begin_src kotlin :exports both
+val byte: Byte = 1 
+val short: Short = 128
+val int: Int = 32768
+val long: Long = 2147483647
+val int1 = 10 // Int als default hergeleiteter Typ
+val long1 = 2147483647 // long, da Wertebereich Int überschreitet
+val long2 = 8L // per L Suffix wird Long als Typ erzwungen
+
+long2.toString(2) // Zahlen sind Objekte, 8 wird als Zahl zur Basis 2 ausgegeben
+#+end_src
+
+#+RESULTS:
+: kotlin.String = 1000
+
+*** Gleitkommazahlen Datentypen
+
+Analog zum vorherigen Abschnitt gibt es auch bei den Gleitkommazahlen
+die beiden von Java bekannten Typen ~Float~ und ~Double~.
+
+#+begin_src kotlin :exports both
+val double : Double = 0.8
+val pi = 3.14
+val pif = 6.28f // Suffix f führt zu Float Type anstatt zum default von Double
+println("${pi.hashCode()} ${pif.hashCode()}")
+#+end_src
+
+#+RESULTS:
+: 300063655 1086911939
+
+*** Booleans
+
+Auch hier gibt es keine großen Überraschungen.
+
+#+begin_src kotlin exports: both
+val myTrue: Boolean = true
+val myFalse: Boolean = false
+
+println(myTrue || myFalse)
+#+end_src
+
+#+RESULTS:
+: true
+
+*** Zeichen/Characters
+
+Hier gibt es ebenfalls keine Überraschungen im Vergleich zu Java.
+
+#+begin_src kotlin export: both
+val charA: Char = 'a'
+val charSpecial = '\n'
+val charB: Char = 'b'
+println("${charA} ${charSpecial} ${charB}")
+#+end_src
+
+#+RESULTS:
+: a 
+:  b
+
+
+*** Zeichenketten/Strings
+
+*** Arrays
+
 
 ** Ausdrücke
 
 * Grundkonstruktion von Programmen
+
+** Kein static Modifier und die Folgen
+Kotlin unterstützt auf Sprachenebene nicht den Modifier ~static~, der
+in Java zur Zuordnung von Variablen und Methoden zu Klassen genutzt
+werden kann. Dies hat für einige Konstrukte in Kotlin gesorgt, um
+Funktionalitäten nachzubilden, für die in Java ~static~ verwendet
+wurde. Die Details dieser Konstrukte sehen wir uns später an.
+
+- Statt static Member Variablen gibt es top-level Properties.
+- Statt static Methoden gibt es top-level Funktionsdefinitionen.
+- Für Singletons gibt es die Möglichkeit top-level Quasi-Klassen zu
+  definieren, von denen genau ein Objekt existiert. Dieses Konstrukt
+  wird auch einfach Object genannt.
+- Um Objekten einer Klasse die Möglichkeit zu geben, um auf
+  Klassenebene Strukturen und Funktionen zu nutzen, gibt es das
+  Konstrukt ~companion object~, das in einer Klasse definiert sein
+  kann. Darüber kann man zum Beispiel ein Factory Method Pattern
+  abbilden. Ein ~companion object~ ist also eine Art Singleton, das
+  explizit einer Klasse zugeordnet ist.
 
 ** Top Level Konstrukte der Programmiersprache
 
 
 *** Funktionen
 
+Die Parameter einer Funktion müssen explizit angegebene Typen haben.
+
 *** Properties	
+
+
 
 *** Interfaces
 
 *** Klassen
 
+**** Properties in Klassen
+Properties in Klassen sind analog zu definieren wie top-level Properties.
+
+#+begin_src kotlin :exports both
+class Test {
+  var test : String = "Variabler Wert"
+  val rtest = "ReadOnly Wert mit type inference"
+}
+
+val t = Test()
+t.test + " " + t.rtest
+#+end_src
+
+Properties in Klassen können analog zu top-level Properties ihre
+default-Getter und -Setter überschreiben:
+#+begin_src kotlin :exports both
+class Test {
+  var test : Int = 2
+  get() = field + 1 // Nutzung des backing field
+  set(value) {
+    field += value
+  }
+}
+val t = Test()
+t.test = 2 // impliziter Call des Setter
+t.test     // impliziter Call des Getter
+#+end_src
+
+
+#+RESULTS:
+: kotlin.Int = 5
+
+Man kann auch die Sichtbarkeit der Getter und Setter steuern:
+#+begin_src kotlin :exports both
+class Test {
+  var test : Int = 2
+  get() = field + 1 // Nutzung des backing field
+  private set // auch ohne Implementierung nur für die Sichtbarkeit
+}
+val t = Test()
+//t.test = 2 würde jetzt einen Fehler ergeben
+t.test     // impliziter Call des Getter
+#+end_src
+
+#+RESULTS:
+: kotlin.Int = 3
+
+
+**** Konstruktoren
+
+Über den sogenannten primary constructor kann man Klassen schön
+kompakt formulieren:
+#+begin_src kotlin :exports both
+class Test (var test : Int) { // Konstruktor Parameter und Property gleichzeitig definiert
+}
+val t = Test(2)
+t.test
+#+end_src
+
+#+RESULTS:
+: kotlin.Int = 2
+
+Dieses Beispiel maximal länglich aber mit primary constructor wäre so zu formulieren:
+#+begin_src kotlin :exports both
+class Test constructor(testparam : Int) {
+  var test : Int = testparam
+}
+val t = Test(2)
+t.test
+#+end_src
+
+#+RESULTS:
+: kotlin.Int = 2
+
+Ein secondary constructor muss den primary constructor immer aufrufen,
+damit der primary constructor bei Objektinitialisierung immer zuerst
+ausgeführt wird. Dies muss vor allen wegen initializer Blocks und
+Property Wertzuweisung passieren:
+#+begin_src kotlin :exports both
+class Test constructor(testparam : Int) {
+  var test : Int = testparam
+  var secTest : Int = 4
+
+  constructor (testparam: Int, secparam : Int) : this(testparam) {
+    secTest = secparam
+  }
+}
+val t = Test(4,4)
+t.test + t.secTest
+#+end_src
+
+#+RESULTS:
+: kotlin.Int = 8
+
+Falls kein primary constructor definiert wird, erzeugt Kotlin einen
+default primary constructor, welcher auch automatisch bei Aufruf eines
+secondary constructors ausgeführt wird:
+#+begin_src kotlin :exports both
+class Test {
+  var test : Int
+  init {
+    test = 8
+  }
+  constructor (testparam : Int) {
+    test += testparam
+  }
+}
+val t = Test(2)
+t.test
+#+end_src
+
+#+RESULTS:
+: kotlin.Int = 10
 
 ** Organisation von Source Code
 
@@ -217,7 +521,18 @@ In diesem Abschnitt beschäftigen wir uns mit der Frage, wie man die
 zuvor erwähnten top-level Sprachkonstrukte organisiert, um eine
 strukturierte Programmentwicklung zu ermöglichen.
 
-*** Modularisierung mittels Packages
+*** Modularisierung
+
+Bisher haben wir in den Beispielen keine Konstrukte zur
+Modularisierung von Code verwendet. Kotlin hat hierbei diese
+Möglichkeiten:
+- Package
+- Module 
+
+Modules spielen eine Rolle bei der Sichtbarkeit von ~internal~
+Deklarationen und ansonsten bei einigen Backends für den Kotlin
+Code. Wir werden dieses Konstrukt daher nicht weiter betrachten.
+
 
 *** Aufbau einer Source Code Datei
 
