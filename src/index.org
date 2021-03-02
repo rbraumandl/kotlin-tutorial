@@ -32,6 +32,17 @@ Wie schon von neueren Versionen von Java und vor allem Scala bekannt,
 ist Kotlin eine objekt-orientierte Programmiersprache, die
 verschiedene Anleihen aus den funktionalen Programmiersprachen nimmt.
 
+Besondere Ziele bei der Entwicklung von Kotlin sind:
+- Boilerplate Code soll vermieden werden (z.B. mittels Data Classes,
+  Default Parameter, Extension Functions, Überladen von Operatoren,
+  Typ Inferenz)
+- Vermeidung von NullPointerExceptions durch Prüfungen zur
+  Compile-Zeit (Null Safety)
+- Integration von Konzepten funktionaler Programmiersprachen (Higher
+  Order Functions, Pattern Matching, Tail Call Optimization)
+- Kompatibilität mit Java
+
+
 * Zielsetzung
 
 In diesem Tutorial werden wir definitiv nicht alle Details der Sprache
@@ -357,13 +368,83 @@ println("${charA} ${charSpecial} ${charB}")
 : a 
 :  b
 
-
 *** Zeichenketten/Strings
+
+Strings sind wiederum sehr ähnlich zu Java aufgebaut. Es gibt
+zusätzlich zu den normalen Strings auch die sogenannten Raw Strings,
+die mehrzeilig sein können und keine Escape Sequenzen umsetzen.
+#+begin_note
+Die in Java 13 eingeführten Raw Strings unterscheiden sich relativ
+stark der Kotlin Variante: Interpretatio von Escape Sequenzen und
+automatische Behandlung von Einrückungen.
+#+end_note
+
+#+begin_src kotlin :exports both
+val rawString = """
+    \n\n\t
+    
+    ein Test
+""".trimIndent()
+
+println(rawString)
+
+println("\n\n")
+
+val withoutMargin1 = """ABC
+                |123
+                |456""".trimMargin()
+
+println(withoutMargin1)
+#+end_src
+
+#+RESULTS:
+: \n\n\t
+: 
+: ein Test
+: 
+: 
+: 
+: ABC
+: 123
+: 456
+
+Die Funktionen ~trimIndent()~ und ~trimMargin()~ entfernen die
+Einrückungen der inneren Zeilen samt Löschen der ersten und letzten
+Zeile.
+
+In normalen wie auch in Raw Strings wird String Interpolation
+unterstützt.
+#+begin_src kotlin :exports both
+val s = "2 + 3 = ${2+3}"
+println(s)
+val sr = """
+2${'$'} + 3${'$'} = ${2+3}${'$'}
+
+4${'$'} + 5${'$'} = ${4+5}${'$'}
+"""
+println(sr)
+#+end_src
+
+#+RESULTS:
+: 2 + 3 = 5
+: 
+: 2$ + 3$ = 5$
+: 
+: 4$ + 5$ = 9$
 
 *** Arrays
 
 
-** Ausdrücke
+** Ausdrücke und Anweisungen
+
+Da Kotlin sich viele Anleihen aus dem Bereich der funktionalen
+Programmierung genommen, sind anders als in Java angepasste Varianten
+von Anweisungen auch in Form von Ausdrücken verwendbar.
+
+#+begin_note
+Anmerkung: Ausdrücke liefern Werte - Anweisungen nicht, sie
+ändern nur den Kontrollfluss.
+#+end_note
 
 * Grundkonstruktion von Programmen
 

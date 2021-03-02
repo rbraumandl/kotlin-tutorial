@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="de" xml:lang="de">
 <head>
-<!-- 2021-02-25 Do 21:31 -->
+<!-- 2021-03-02 Di 21:44 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Kotlin Tutorial</title>
@@ -268,7 +268,7 @@ for the JavaScript code in this tag.
 <ul>
 <li><a href="#orged91158">Lokale Variablen</a></li>
 <li><a href="#org5988f0d">Elementare Datentypen</a></li>
-<li><a href="#orge8900e3">Ausdrücke</a></li>
+<li><a href="#orgde02234">Ausdrücke und Anweisungen</a></li>
 </ul>
 </li>
 <li><a href="#org77d0243">Grundkonstruktion von Programmen</a>
@@ -315,8 +315,23 @@ Wie schon von neueren Versionen von Java und vor allem Scala bekannt,
 ist Kotlin eine objekt-orientierte Programmiersprache, die
 verschiedene Anleihen aus den funktionalen Programmiersprachen nimmt.
 </p>
+
+<p>
+Besondere Ziele bei der Entwicklung von Kotlin sind:
+</p>
+<ul class="org-ul">
+<li>Boilerplate Code soll vermieden werden (z.B. mittels Data Classes,
+Default Parameter, Extension Functions, Überladen von Operatoren,
+Typ Inferenz)</li>
+<li>Vermeidung von NullPointerExceptions durch Prüfungen zur
+Compile-Zeit (Null Safety)</li>
+<li>Integration von Konzepten funktionaler Programmiersprachen (Higher
+Order Functions, Pattern Matching, Tail Call Optimization)</li>
+<li>Kompatibilität mit Java</li>
+</ul>
 </div>
 </div>
+
 
 <div id="outline-container-org11468a8" class="outline-2">
 <h2 id="org11468a8">Zielsetzung</h2>
@@ -744,9 +759,85 @@ println(<span style="color: #8b2252;">"${</span>charA<span style="color: #8b2252
 </div>
 </div>
 
-
 <div id="outline-container-orgf968a2a" class="outline-4">
 <h4 id="orgf968a2a">Zeichenketten/Strings</h4>
+<div class="outline-text-4" id="text-orgf968a2a">
+<p>
+Strings sind wiederum sehr ähnlich zu Java aufgebaut. Es gibt
+zusätzlich zu den normalen Strings auch die sogenannten Raw Strings,
+die mehrzeilig sein können und keine Escape Sequenzen umsetzen.
+</p>
+<div class="note">
+<p>
+Die in Java 13 eingeführten Raw Strings unterscheiden sich relativ
+stark der Kotlin Variante: Interpretatio von Escape Sequenzen und
+automatische Behandlung von Einrückungen.
+</p>
+
+</div>
+
+<div class="org-src-container">
+<pre class="src src-kotlin"><span style="color: #a020f0;">val</span> <span style="color: #a0522d;">rawString</span> = <span style="color: #8b2252;">"""</span>
+<span style="color: #8b2252;">    \n\n\t</span>
+
+<span style="color: #8b2252;">    ein Test</span>
+<span style="color: #8b2252;">"""</span>.trimIndent()
+
+println(rawString)
+
+println(<span style="color: #8b2252;">"\n\n"</span>)
+
+<span style="color: #a020f0;">val</span> <span style="color: #a0522d;">withoutMargin1</span> = <span style="color: #8b2252;">"""ABC</span>
+<span style="color: #8b2252;">                |123</span>
+<span style="color: #8b2252;">                |456"""</span>.trimMargin()
+
+println(withoutMargin1)
+</pre>
+</div>
+
+<pre class="example">
+\n\n\t
+
+ein Test
+
+
+
+ABC
+123
+456
+</pre>
+
+
+<p>
+Die Funktionen <code>trimIndent()</code> und <code>trimMargin()</code> entfernen die
+Einrückungen der inneren Zeilen samt Löschen der ersten und letzten
+Zeile.
+</p>
+
+<p>
+In normalen wie auch in Raw Strings wird String Interpolation
+unterstützt.
+</p>
+<div class="org-src-container">
+<pre class="src src-kotlin"><span style="color: #a020f0;">val</span> <span style="color: #a0522d;">s</span> = <span style="color: #8b2252;">"2 + 3 = ${</span>2+3<span style="color: #8b2252;">}"</span>
+println(s)
+<span style="color: #a020f0;">val</span> <span style="color: #a0522d;">sr</span> = <span style="color: #8b2252;">"""</span>
+<span style="color: #8b2252;">2${'$'} + 3${'$'} = ${</span>2+3<span style="color: #8b2252;">}${'$'}</span>
+
+<span style="color: #8b2252;">4${'$'} + 5${'$'} = ${</span>4+5<span style="color: #8b2252;">}${'$'}</span>
+<span style="color: #8b2252;">"""</span>
+println(sr)
+</pre>
+</div>
+
+<pre class="example">
+2 + 3 = 5
+
+2$ + 3$ = 5$
+
+4$ + 5$ = 9$
+</pre>
+</div>
 </div>
 
 <div id="outline-container-org484567e" class="outline-4">
@@ -755,8 +846,23 @@ println(<span style="color: #8b2252;">"${</span>charA<span style="color: #8b2252
 </div>
 
 
-<div id="outline-container-orge8900e3" class="outline-3">
-<h3 id="orge8900e3">Ausdrücke</h3>
+<div id="outline-container-orgde02234" class="outline-3">
+<h3 id="orgde02234">Ausdrücke und Anweisungen</h3>
+<div class="outline-text-3" id="text-orgde02234">
+<p>
+Da Kotlin sich viele Anleihen aus dem Bereich der funktionalen
+Programmierung genommen, sind anders als in Java angepasste Varianten
+von Anweisungen auch in Form von Ausdrücken verwendbar.
+</p>
+
+<div class="note">
+<p>
+Anmerkung: Ausdrücke liefern Werte - Anweisungen nicht, sie
+ändern nur den Kontrollfluss.
+</p>
+
+</div>
+</div>
 </div>
 </div>
 
@@ -1025,7 +1131,7 @@ Code. Wir werden dieses Konstrukt daher nicht weiter betrachten.
 </div>
 <div id="postamble" class="status">
 <p class="author">Autor: Reinhard Braumandl</p>
-<p class="date">Created: 2021-02-25 Do 21:31</p>
+<p class="date">Created: 2021-03-02 Di 21:44</p>
 <p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
 </body>
