@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="de" xml:lang="de">
 <head>
-<!-- 2021-03-02 Di 21:44 -->
+<!-- 2021-04-17 Sa 20:09 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Kotlin Tutorial</title>
@@ -278,6 +278,7 @@ for the JavaScript code in this tag.
 <li><a href="#org7d00225">Organisation von Source Code</a></li>
 </ul>
 </li>
+<li><a href="#orgeca5528">Erstellen einer Domain Specific Language</a></li>
 </ul>
 </div>
 </div>
@@ -644,15 +645,14 @@ a = 1, b = 2, c = 3
 </div>
 
 
-
 <div id="outline-container-org5988f0d" class="outline-3">
 <h3 id="org5988f0d">Elementare Datentypen</h3>
 <div class="outline-text-3" id="text-org5988f0d">
 <p>
-Anders als in Java werden in Kotlin nur Objekttypen verwendet, auch
-für alle elementaren Datentypen. Als Konsequenz sind alle Operationen
-auf den Datentypen per Member-Funktion erreichbar, wobei die
-Operationen größtenteils den aus Java bekannten gleichen.
+Anders als in Java werden in Kotlin (fast ausnahmslos) nur Objekttypen
+verwendet, auch für alle elementaren Datentypen. Als Konsequenz sind
+alle Operationen auf den Datentypen per Member-Funktion erreichbar,
+wobei die Operationen größtenteils den aus Java bekannten gleichen.
 </p>
 
 <p>
@@ -679,10 +679,17 @@ Es gibt die von Java bekannten vorzeichenbehafteten Typen (signed integers)
 <div class="note">
 <p>
 In den neueren Version von Kotlin ist experimenteller Support für
-unsigned integers integriert.
+unsigned integers integriert. Wir gehen aber nicht näher darauf ein.
 </p>
 
 </div>
+
+<p>
+Bei Belegung von Variablen mit Literalen und fehlender Typangabe wählt
+Kotlin im Standardfall den Typ <code>Int</code> aus. Falls der Wertebereich aber
+nicht ausreichend ist für das Literal wird <code>Long</code> gewählt. Man kann den
+Type <code>Long</code> aber auch per Suffic <code>L</code> an dem Zahlenliteral erzwingen.
+</p>
 
 <div class="org-src-container">
 <pre class="src src-kotlin"><span style="color: #a020f0;">val</span> <span style="color: #a0522d;">byte</span>: <span style="color: #228b22;">Byte</span> = 1 
@@ -842,9 +849,74 @@ println(sr)
 
 <div id="outline-container-org484567e" class="outline-4">
 <h4 id="org484567e">Arrays</h4>
-</div>
+<div class="outline-text-4" id="text-org484567e">
+<p>
+Zur Darstellung von Arrays wird die generische Klasse <code>Array</code>
+verwendet. Diese Klasse bietet auch eine Vielzahl nützlicher Member
+Funktionen an (Sortierung, Suche, Slicing, &#x2026;). Analog wie bei Java
+kann die Länge eines Arrays nicht verändert werden. 
+</p>
+
+<p>
+Zum Erzeugen von Arrays gibt die beiden Wege über die <code>arrayOf()</code>
+Funktion und über einen Konstruktor der <code>Array</code> Klasse:
+</p>
+<div class="org-src-container">
+<pre class="src src-kotlin"><span style="color: #a020f0;">val</span> <span style="color: #a0522d;">stringArray</span> : <span style="color: #228b22;">Array&lt;String&gt;</span> = arrayOf(<span style="color: #8b2252;">"1"</span>,<span style="color: #8b2252;">"2"</span>)
+println(<span style="color: #8b2252;">"L&#228;nge: ${</span>stringArray.size<span style="color: #8b2252;">}"</span>)
+<span style="color: #a020f0;">val</span> <span style="color: #a0522d;">stringArray2</span> = <span style="color: #228b22;">Array</span>(4){ i -&gt; i.toString()}
+stringArray2[2]
+</pre>
 </div>
 
+<pre class="example">
+Länge: 2
+kotlin.String = 2
+</pre>
+
+
+<div class="org-src-container">
+<pre class="src src-kotlin"><span style="color: #a020f0;">fun</span> <span style="color: #0000ff;">arrayTest</span>() : <span style="color: #228b22;">Unit</span> {
+<span style="color: #a020f0;">val</span> <span style="color: #a0522d;">stringArray</span> : <span style="color: #228b22;">Array&lt;String&gt;</span> = arrayOf(<span style="color: #8b2252;">"1"</span>, <span style="color: #8b2252;">"2"</span>)
+println(<span style="color: #8b2252;">"Zugriff &#252;ber eckige Klammern Operator: ${</span>stringArray[0] == <span style="color: #8b2252;">"1"}"</span>)
+stringArray.sort()
+<span style="color: #b22222;">// </span><span style="color: #b22222;">Arrays haben eine feste L&#228;nge, so dass bei einigen Funktionen auf Arrays neue Arrays erzeugt werden:</span>
+<span style="color: #a020f0;">val</span> <span style="color: #a0522d;">stringArray2</span> = stringArray.plus(<span style="color: #8b2252;">"3"</span>)
+<span style="color: #b22222;">// </span><span style="color: #b22222;">=== ermittelt die Objektidentit&#228;t, == die strukturelle Identit&#228;t</span>
+println(<span style="color: #8b2252;">"Sind die Arrays identisch: ${</span>stringArray === stringArray2<span style="color: #8b2252;">}"</span>)
+<span style="color: #b22222;">// </span><span style="color: #b22222;">== entspricht dem Vergleich mit der equals() Member Funktion</span>
+println(<span style="color: #8b2252;">"Sind die Arrays gleich: ${</span>stringArray == arrayOf(<span style="color: #8b2252;">"1"</span>,<span style="color: #8b2252;">"2"</span>)<span style="color: #8b2252;">}"</span>)
+println(<span style="color: #8b2252;">"Sind die Arrays gleich: ${</span>arrayOf(<span style="color: #8b2252;">"1"</span>,<span style="color: #8b2252;">"2"</span>).contentDeepEquals(stringArray)<span style="color: #8b2252;">}"</span>)
+stringArray.forEach { s -&gt; print(s) }
+println()
+println(<span style="color: #8b2252;">"----------"</span>)
+stringArray2.forEach { s -&gt; print(s) }
+println()
+println(<span style="color: #8b2252;">"Arrays schneiden: ${</span>stringArray2.sliceArray(0..1).contentDeepEquals(stringArray)<span style="color: #8b2252;">}"</span>)
+}
+arrayTest()
+</pre>
+</div>
+
+<p>
+Zusätzlich gibt es noch die Möglichkeit Arrays von primitiven Typen zu nutzen.
+Der wichtigste Grund für deren Verwendung ist, dass zur Laufzeit Speicherplatz
+gespart wird, da die Inhalte dieser Arrays aus primitiven Typen gebildet werden.
+Diese Arrays sind nicht von der Klasse <code>Array</code> in irgendeiner Form abgeleitet,
+besitzen aber ähnlichen Funktionsumfang.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-kotlin"><span style="color: #a020f0;">val</span> <span style="color: #a0522d;">intarray</span> : <span style="color: #228b22;">IntArray</span> = intArrayOf(1,2,3)
+intarray.forEach{ ia -&gt; println(ia) }
+println()
+<span style="color: #a020f0;">val</span> <span style="color: #a0522d;">doublearray</span> : <span style="color: #228b22;">DoubleArray</span> = doubleArrayOf(1.0, 2.0, 3.0)
+doublearray.forEach{ da -&gt; println(da) }
+</pre>
+</div>
+</div>
+</div>
+</div>
 
 <div id="outline-container-orgde02234" class="outline-3">
 <h3 id="orgde02234">Ausdrücke und Anweisungen</h3>
@@ -905,8 +977,121 @@ explizit einer Klasse zugeordnet ist.</li>
 <h4 id="org6e31034">Funktionen</h4>
 <div class="outline-text-4" id="text-org6e31034">
 <p>
+Funktionen treten in den Variationen
+</p>
+<ul class="org-ul">
+<li>Top-level Funktion</li>
+<li>Lokale Funktion innerhalb einer anderen Funktion (Local Function)</li>
+<li>Member Funktion eines Typs (Member Function)</li>
+<li>Funktionsliterale (function liberal) sind Lambda Ausdrücke und
+anonyme Funktionen</li>
+</ul>
+<p>
+auf.
+</p>
+
+<p>
 Die Parameter einer Funktion müssen explizit angegebene Typen haben.
 </p>
+
+<div class="org-src-container">
+<pre class="src src-kotlin"><span style="color: #b22222;">// </span><span style="color: #b22222;">Parameter k&#246;nnen default Werte haben:</span>
+<span style="color: #a020f0;">fun</span> <span style="color: #0000ff;">test1</span>(a:<span style="color: #228b22;">Int</span>, b:<span style="color: #228b22;">Int</span> = 4) : <span style="color: #228b22;">Int</span> {
+  <span style="color: #a020f0;">return</span> a+b
+}
+<span style="color: #b22222;">// </span><span style="color: #b22222;">wie &#252;blich</span>
+println(test1(1,2))
+<span style="color: #b22222;">// </span><span style="color: #b22222;">mit Benennung der Parameter:</span>
+println(test1(b = 3, a = 1))
+<span style="color: #b22222;">// </span><span style="color: #b22222;">Parameter mit default Werten k&#246;nnen entfallen, so lange </span>
+<span style="color: #b22222;">// </span><span style="color: #b22222;">die Zuordnung der Parameter gew&#228;hrleistet ist:</span>
+println(test1(1))
+
+<span style="color: #b22222;">// </span><span style="color: #b22222;">Wenn eine Funktion keine R&#252;ckgabe per return t&#228;tigt</span>
+<span style="color: #b22222;">// </span><span style="color: #b22222;">ist der R&#252;ckgabetyp Unit bzw. muss es sein.</span>
+<span style="color: #b22222;">// </span><span style="color: #b22222;">&#220;bergabe eines Lambda Ausdrucks an eine Funktion:</span>
+<span style="color: #a020f0;">fun</span> <span style="color: #0000ff;">testLambda</span>(foo : <span style="color: #228b22;">Int</span>, la : (<span style="color: #228b22;">Int</span>) -&gt; <span style="color: #228b22;">Unit</span>) : <span style="color: #228b22;">Unit</span> {
+  la(foo)
+ }
+testLambda(45, {<span style="color: #a020f0;">it</span> -&gt; println(<span style="color: #a020f0;">it</span>)})
+<span style="color: #b22222;">// </span><span style="color: #b22222;">Wenn eine Funktion nur einen Ausdruck berechnet kann eine Kurzform</span>
+<span style="color: #b22222;">// </span><span style="color: #b22222;">ohne return Anweisung und geschweiften Klammern verwendet werden:</span>
+<span style="color: #a020f0;">fun</span> <span style="color: #0000ff;">shortTest</span>(a: <span style="color: #228b22;">Int</span>, b: <span style="color: #228b22;">Int</span>) : <span style="color: #228b22;">Int</span> = a + b
+println(shortTest(20,40))
+
+<span style="color: #b22222;">// </span><span style="color: #b22222;">Variable Anzahl von Parametern werden als Array &#252;bergeben:</span>
+<span style="color: #a020f0;">fun</span> <span style="color: #0000ff;">varTest</span>(<span style="color: #a020f0;">vararg</span> ts: <span style="color: #228b22;">Int</span>) : <span style="color: #228b22;">Int</span> {
+  <span style="color: #a020f0;">return</span> ts.fold(0,{acc:<span style="color: #228b22;">Int</span>, i:<span style="color: #228b22;">Int</span> -&gt; acc + i})
+}
+println(varTest(1,2,3))
+</pre>
+</div>
+
+<pre class="example">
+3
+4
+5
+45
+60
+6
+</pre>
+
+
+<p>
+Funktionen können auch Infix Notation nutzen, wenn die Funktion eine
+Member Funktion (oder Extension Funktion) ist, nur einen Parameter hat
+und dieser nicht <code>vararg</code> ist.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-kotlin"><span style="color: #a020f0;">class</span> <span style="color: #228b22;">FunctionExample</span> (<span style="color: #a020f0;">val</span> <span style="color: #a0522d;">iMem</span> : <span style="color: #228b22;">Int</span>) {
+    <span style="color: #a020f0;">infix</span> <span style="color: #a020f0;">fun</span> <span style="color: #0000ff;">ifxFun</span>(param : <span style="color: #228b22;">Int</span>) : <span style="color: #228b22;">Int</span> {
+        <span style="color: #a020f0;">return</span> iMem + param;
+    }
+}
+
+<span style="color: #a020f0;">fun</span> <span style="color: #0000ff;">main</span>() {
+    <span style="color: #a020f0;">val</span> <span style="color: #a0522d;">funEx</span> = <span style="color: #228b22;">FunctionExample</span>(200)
+    println(funEx ifxFun 4)
+}
+</pre>
+</div>
+
+<p>
+Funktionen können auch generisch sein:
+</p>
+<div class="org-src-container">
+<pre class="src src-kotlin"><span style="color: #a020f0;">fun</span> &lt;<span style="color: #228b22;">T&gt;</span> testToList(item: <span style="color: #228b22;">T</span>): <span style="color: #228b22;">List&lt;T&gt;</span> {
+  <span style="color: #a020f0;">return</span> listOf(item)
+}
+testToList(12)
+</pre>
+</div>
+
+<pre class="example">
+kotlin.collections.List&lt;kotlin.Int&gt; = [12]
+</pre>
+
+
+<p>
+Higher Order Functions bekommen Funktionen als Parameter oder geben
+eine Funktion zurück. Um dies zu ermöglichen, muss der Typ einer
+Funktion angegeben werden können, um z.B. damit den Typ eines
+Funktionsparameters festzulegen.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-kotlin"><span style="color: #a020f0;">fun</span> &lt;<span style="color: #228b22;">T&gt;</span> countDelegate(liste: <span style="color: #228b22;">List&lt;T&gt;</span>, counter: (<span style="color: #228b22;">List&lt;T&gt;</span>) -&gt; <span style="color: #228b22;">Int</span>) : <span style="color: #228b22;">Int</span>{
+  <span style="color: #a020f0;">return</span> counter(liste)
+}
+
+countDelegate(listOf(1,2,3), <span style="color: #228b22;">List&lt;Int&gt;</span>::size)
+</pre>
+</div>
+
+<pre class="example">
+kotlin.Int = 3
+</pre>
 </div>
 </div>
 
@@ -1128,10 +1313,108 @@ Code. Wir werden dieses Konstrukt daher nicht weiter betrachten.
 </div>
 </div>
 </div>
+
+<div id="outline-container-orgeca5528" class="outline-2">
+<h2 id="orgeca5528">Erstellen einer Domain Specific Language</h2>
+<div class="outline-text-2" id="text-orgeca5528">
+<p>
+Einige Sprachfeatures von Kotlin wurden im Hinblick auf die Erstellung
+von Domain Specific Languages eingeführt bzw. optimiert. Dazu zählen:
+</p>
+<ul class="org-ul">
+<li>Function type with receiver: Hiermit können Funktionsliterale
+erzeugt werden, die Objekte eines in der Signatur der Funktion
+angegebenen Typs als <code>this</code> Referenz in der Implementierung der
+Funktion nutzen können. D.h. die Funktion hat die Möglichkeiten wie
+eine Member Funktion des Typs, ohne aber Teil der Typdefinition zu
+sein, da sie ein Funktionsliteral ist.</li>
+<li>Ein Lambda Ausdruck als letzter Parameter einer Funktion kann
+außerhalb der runden Klammern der Parameterliste übergeben
+werden. Der Lamba Ausdruck sieht dann so aus, als würde er als Block
+zum Funktionsaufruf gehören, wird aber in der eigentlichen Funktion
+verwendet.</li>
+<li>Funktionen, die in Infix Notation aufgerufen werden können.</li>
+<li>Die Möglichkeit Operatoren zu überladen (Operator Overloading).</li>
+<li>Die Möglichkeit Funktionen mit benannten Parameter aufzurufen.</li>
+</ul>
+
+
+<div class="org-src-container">
+<pre class="src src-kotlin"><span style="color: #a020f0;">class</span> <span style="color: #228b22;">DslTestbed</span> {
+    <span style="color: #a020f0;">class</span> <span style="color: #228b22;">Outer</span> {
+        <span style="color: #a020f0;">var</span> <span style="color: #a0522d;">innerNodes</span> = mutableListOf&lt;<span style="color: #228b22;">Inner&gt;</span>()
+
+        <span style="color: #a020f0;">fun</span> <span style="color: #a020f0;">inner</span>(<span style="color: #a020f0;">init</span>: <span style="color: #228b22;">Inner.</span>() -&gt; <span style="color: #228b22;">Unit</span>){
+            <span style="color: #a020f0;">val</span> <span style="color: #a0522d;">child</span> = <span style="color: #228b22;">Inner</span>()
+            child.<span style="color: #a020f0;">init</span>()
+            innerNodes.add(child)
+        }
+
+        <span style="color: #a020f0;">fun</span> <span style="color: #0000ff;">show</span>() : <span style="color: #228b22;">String</span> {
+            <span style="color: #a020f0;">val</span> <span style="color: #a0522d;">lines</span> = mutableListOf&lt;<span style="color: #228b22;">String&gt;</span>()
+            lines.add(<span style="color: #8b2252;">"Outer node"</span>)
+            innerNodes.forEach(){
+                lines.add(<span style="color: #a020f0;">it</span>.show())
+            }
+            <span style="color: #a020f0;">return</span> lines.joinToString(separator = <span style="color: #8b2252;">"\n"</span>)
+        }
+    }
+
+    <span style="color: #a020f0;">class</span> <span style="color: #228b22;">Inner</span>() {
+        <span style="color: #a020f0;">val</span> <span style="color: #a0522d;">innerNodes</span> = mutableListOf&lt;<span style="color: #228b22;">InnerMost&gt;</span>()
+
+        <span style="color: #a020f0;">fun</span> <span style="color: #0000ff;">innerMost</span>(weight: <span style="color: #228b22;">Double</span>){
+            <span style="color: #a020f0;">val</span> <span style="color: #a0522d;">child</span> = <span style="color: #228b22;">InnerMost</span>(weight)
+            innerNodes.add(child)
+        }
+
+        <span style="color: #a020f0;">fun</span> <span style="color: #0000ff;">show</span>() : <span style="color: #228b22;">String</span> {
+            <span style="color: #a020f0;">val</span> <span style="color: #a0522d;">lines</span> = mutableListOf&lt;<span style="color: #228b22;">String&gt;</span>()
+            lines.add(<span style="color: #8b2252;">"Inner node: "</span>.prependIndent(<span style="color: #8b2252;">"  "</span>))
+            innerNodes.forEach(){
+                lines.add(<span style="color: #a020f0;">it</span>.show())
+            }
+            <span style="color: #a020f0;">return</span> lines.joinToString(separator = <span style="color: #8b2252;">"\n"</span>)
+        }
+    }
+
+    <span style="color: #a020f0;">class</span> <span style="color: #228b22;">InnerMost</span>(<span style="color: #a020f0;">val</span> <span style="color: #a0522d;">weight</span>: <span style="color: #228b22;">Double</span>) {
+        <span style="color: #a020f0;">fun</span> <span style="color: #0000ff;">show</span>() : <span style="color: #228b22;">String</span> {
+            <span style="color: #a020f0;">return</span> <span style="color: #8b2252;">"InnerMost node: "</span>.prependIndent(<span style="color: #8b2252;">"    "</span>) + <span style="color: #228b22;">String.format</span>(<span style="color: #8b2252;">"%+07.2g"</span>,weight)
+        }
+    }
+
+    <span style="color: #a020f0;">companion</span> <span style="color: #a020f0;">object</span> {
+        <span style="color: #a020f0;">fun</span> <span style="color: #0000ff;">outer</span>(<span style="color: #a020f0;">init</span>: <span style="color: #228b22;">Outer.</span>() -&gt; <span style="color: #228b22;">Unit</span>) : <span style="color: #228b22;">String</span> {
+            <span style="color: #a020f0;">val</span> <span style="color: #a0522d;">outer</span> = <span style="color: #228b22;">Outer</span>()
+            outer.<span style="color: #a020f0;">init</span>()
+            <span style="color: #a020f0;">return</span> outer.show()
+        }
+    }
+}
+
+<span style="color: #a020f0;">fun</span> <span style="color: #0000ff;">main</span>() {
+    <span style="color: #a020f0;">val</span> <span style="color: #a0522d;">structure</span> =
+        <span style="color: #228b22;">DslTestbed.outer</span> {
+            <span style="color: #a020f0;">inner</span> {
+                innerMost(weight = 45.8889)
+                innerMost(weight = -1938.4883)
+            }
+            <span style="color: #a020f0;">inner</span> {
+                innerMost(weight = 22.0048)
+                innerMost(weight = 234234.23423)
+            }
+        }
+    println(structure)
+}
+</pre>
+</div>
+</div>
+</div>
 </div>
 <div id="postamble" class="status">
 <p class="author">Autor: Reinhard Braumandl</p>
-<p class="date">Created: 2021-03-02 Di 21:44</p>
+<p class="date">Created: 2021-04-17 Sa 20:09</p>
 <p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
 </body>

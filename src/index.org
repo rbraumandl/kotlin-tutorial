@@ -283,13 +283,12 @@ main()
 : a = 1, b = 2, c = 3
 
 
-
 ** Elementare Datentypen
 
-Anders als in Java werden in Kotlin nur Objekttypen verwendet, auch
-für alle elementaren Datentypen. Als Konsequenz sind alle Operationen
-auf den Datentypen per Member-Funktion erreichbar, wobei die
-Operationen größtenteils den aus Java bekannten gleichen.
+Anders als in Java werden in Kotlin (fast ausnahmslos) nur Objekttypen
+verwendet, auch für alle elementaren Datentypen. Als Konsequenz sind
+alle Operationen auf den Datentypen per Member-Funktion erreichbar,
+wobei die Operationen größtenteils den aus Java bekannten gleichen.
 
 Intern verwendet Kotlin aus Performancegründen teilweise die
 primitiven Datentypen der Java VM, aber dies ist weitestgehend
@@ -306,8 +305,13 @@ Es gibt die von Java bekannten vorzeichenbehafteten Typen (signed integers)
 
 #+begin_note
 In den neueren Version von Kotlin ist experimenteller Support für
-unsigned integers integriert.
+unsigned integers integriert. Wir gehen aber nicht näher darauf ein.
 #+end_note
+
+Bei Belegung von Variablen mit Literalen und fehlender Typangabe wählt
+Kotlin im Standardfall den Typ ~Int~ aus. Falls der Wertebereich aber
+nicht ausreichend ist für das Literal wird ~Long~ gewählt. Man kann den
+Type ~Long~ aber auch per Suffic ~L~ an dem Zahlenliteral erzwingen.
 
 #+begin_src kotlin :exports both
 val byte: Byte = 1 
@@ -434,6 +438,80 @@ println(sr)
 
 *** Arrays
 
+Zur Darstellung von Arrays wird die generische Klasse ~Array~
+verwendet. Diese Klasse bietet auch eine Vielzahl nützlicher Member
+Funktionen an (Sortierung, Suche, Slicing, ...). Analog wie bei Java
+kann die Länge eines Arrays nicht verändert werden. 
+
+Zum Erzeugen von Arrays gibt die beiden Wege über die ~arrayOf()~
+Funktion und über einen Konstruktor der ~Array~ Klasse:
+#+begin_src kotlin :exports both
+val stringArray : Array<String> = arrayOf("1","2")
+println("Länge: ${stringArray.size}")
+val stringArray2 = Array(4){ i -> i.toString()}
+stringArray2[2]
+#+end_src
+
+#+RESULTS:
+: Länge: 2
+: res10: kotlin.String = 2
+: res11: kotlin.String = >>> 
+
+#+begin_src kotlin exports: both
+fun arrayTest() : Unit {
+val stringArray : Array<String> = arrayOf("1", "2")
+println("Zugriff über eckige Klammern Operator: ${stringArray[0] == "1"}")
+stringArray.sort()
+// Arrays haben eine feste Länge, so dass bei einigen Funktionen auf Arrays neue Arrays erzeugt werden:
+val stringArray2 = stringArray.plus("3")
+// === ermittelt die Objektidentität, == die strukturelle Identität
+println("Sind die Arrays identisch: ${stringArray === stringArray2}")
+// == entspricht dem Vergleich mit der equals() Member Funktion
+println("Sind die Arrays gleich: ${stringArray == arrayOf("1","2")}")
+println("Sind die Arrays gleich: ${arrayOf("1","2").contentDeepEquals(stringArray)}")
+stringArray.forEach { s -> print(s) }
+println()
+println("----------")
+stringArray2.forEach { s -> print(s) }
+println()
+println("Arrays schneiden: ${stringArray2.sliceArray(0..1).contentDeepEquals(stringArray)}")
+}
+arrayTest()
+#+end_src
+
+#+RESULTS:
+: Zugriff über eckige Klammern Operator: true
+: Sind die Arrays identisch: false
+: Sind die Arrays gleich: false
+: Sind die Arrays gleich: true
+: 12
+: ----------
+: 123
+: Arrays schneiden: true
+: res1: kotlin.String = >>> 
+
+Zusätzlich gibt es noch die Möglichkeit Arrays von primitiven Typen zu nutzen.
+Der wichtigste Grund für deren Verwendung ist, dass zur Laufzeit Speicherplatz
+gespart wird, da die Inhalte dieser Arrays aus primitiven Typen gebildet werden.
+Diese Arrays sind nicht von der Klasse ~Array~ in irgendeiner Form abgeleitet,
+besitzen aber ähnlichen Funktionsumfang.
+
+#+begin_src kotlin exports: both
+val intarray : IntArray = intArrayOf(1,2,3)
+intarray.forEach{ ia -> println(ia) }
+println()
+val doublearray : DoubleArray = doubleArrayOf(1.0, 2.0, 3.0)
+doublearray.forEach{ da -> println(da) }
+#+end_src
+
+#+RESULTS:
+: 1
+: 2
+: 3
+: 
+: 1.0
+: 2.0
+: 3.0
 
 ** Ausdrücke und Anweisungen
 
@@ -472,7 +550,91 @@ wurde. Die Details dieser Konstrukte sehen wir uns später an.
 
 *** Funktionen
 
+Funktionen treten in den Variationen
+- Top-level Funktion
+- Lokale Funktion innerhalb einer anderen Funktion (Local Function)
+- Member Funktion eines Typs (Member Function)
+- Funktionsliterale (function liberal) sind Lambda Ausdrücke und
+  anonyme Funktionen
+auf.
+
 Die Parameter einer Funktion müssen explizit angegebene Typen haben.
+
+#+begin_src kotlin :exports both
+// Parameter können default Werte haben:
+fun test1(a:Int, b:Int = 4) : Int {
+  return a+b
+}
+// wie üblich
+println(test1(1,2))
+// mit Benennung der Parameter:
+println(test1(b = 3, a = 1))
+// Parameter mit default Werten können entfallen, so lange 
+// die Zuordnung der Parameter gewährleistet ist:
+println(test1(1))
+
+// Wenn eine Funktion keine Rückgabe per return tätigt
+// ist der Rückgabetyp Unit bzw. muss es sein.
+// Übergabe eines Lambda Ausdrucks an eine Funktion:
+fun testLambda(foo : Int, la : (Int) -> Unit) : Unit {
+  la(foo)
+ }
+testLambda(45, {it -> println(it)})
+// Wenn eine Funktion nur einen Ausdruck berechnet kann eine Kurzform
+// ohne return Anweisung und geschweiften Klammern verwendet werden:
+fun shortTest(a: Int, b: Int) : Int = a + b
+println(shortTest(20,40))
+
+// Variable Anzahl von Parametern werden als Array übergeben:
+fun varTest(vararg ts: Int) : Int {
+  return ts.fold(0,{acc:Int, i:Int -> acc + i})
+}
+println(varTest(1,2,3))
+#+end_src
+
+Funktionen können auch Infix Notation nutzen, wenn die Funktion eine
+Member Funktion (oder Extension Funktion) ist, nur einen Parameter hat
+und dieser nicht ~vararg~ ist.
+
+#+begin_src kotlin :export source
+class FunctionExample (val iMem : Int) {
+    infix fun ifxFun(param : Int) : Int {
+        return iMem + param;
+    }
+}
+
+fun main() {
+    val funEx = FunctionExample(200)
+    println(funEx ifxFun 4)
+}
+#+end_src
+
+Funktionen können auch generisch sein:
+#+begin_src kotlin :exports both
+fun <T> testToList(item: T): List<T> {
+  return listOf(item)
+}
+testToList(12)
+#+end_src
+
+#+RESULTS:
+: kotlin.collections.List<kotlin.Int> = [12]
+
+Higher Order Functions bekommen Funktionen als Parameter oder geben
+eine Funktion zurück. Um dies zu ermöglichen, muss der Typ einer
+Funktion angegeben werden können, um z.B. damit den Typ eines
+Funktionsparameters festzulegen.
+
+#+begin_src kotlin :exports both
+fun <T> countDelegate(liste: List<T>, counter: (List<T>) -> Int) : Int{
+  return counter(liste)
+}
+
+countDelegate(listOf(1,2,3), List<Int>::size)
+#+end_src
+
+#+RESULTS:
+: kotlin.Int = 3
 
 *** Properties	
 
@@ -621,4 +783,93 @@ Code. Wir werden dieses Konstrukt daher nicht weiter betrachten.
 
 *** Sichtbarkeitsregeln
 
+* Erstellen einer Domain Specific Language
+Einige Sprachfeatures von Kotlin wurden im Hinblick auf die Erstellung
+von Domain Specific Languages eingeführt bzw. optimiert. Dazu zählen:
+- Function type with receiver: Hiermit können Funktionsliterale
+  erzeugt werden, die Objekte eines in der Signatur der Funktion
+  angegebenen Typs als ~this~ Referenz in der Implementierung der
+  Funktion nutzen können. D.h. die Funktion hat die Möglichkeiten wie
+  eine Member Funktion des Typs, ohne aber Teil der Typdefinition zu
+  sein, da sie ein Funktionsliteral ist. 
+- Ein Lambda Ausdruck als letzter Parameter einer Funktion kann
+  außerhalb der runden Klammern der Parameterliste übergeben
+  werden. Der Lamba Ausdruck sieht dann so aus, als würde er als Block
+  zum Funktionsaufruf gehören, wird aber in der eigentlichen Funktion
+  verwendet.
+- Funktionen, die in Infix Notation aufgerufen werden können.
+- Die Möglichkeit Operatoren zu überladen (Operator Overloading).
+- Die Möglichkeit Funktionen mit benannten Parameter aufzurufen.
 
+
+#+begin_src kotlin :exports both
+class DslTestbed {
+    class Outer {
+        var innerNodes = mutableListOf<Inner>()
+
+        fun inner(init: Inner.() -> Unit){
+            val child = Inner()
+            child.init()
+            innerNodes.add(child)
+        }
+
+        fun show() : String {
+            val lines = mutableListOf<String>()
+            lines.add("Outer node")
+            innerNodes.forEach(){
+                lines.add(it.show())
+            }
+            return lines.joinToString(separator = "\n")
+        }
+    }
+
+    class Inner() {
+        val innerNodes = mutableListOf<InnerMost>()
+
+        fun innerMost(weight: Double){
+            val child = InnerMost(weight)
+            innerNodes.add(child)
+        }
+
+        fun show() : String {
+            val lines = mutableListOf<String>()
+            lines.add("Inner node: ".prependIndent("  "))
+            innerNodes.forEach(){
+                lines.add(it.show())
+            }
+            return lines.joinToString(separator = "\n")
+        }
+    }
+
+    class InnerMost(val weight: Double) {
+        fun show() : String {
+            return "InnerMost node: ".prependIndent("    ") + String.format("%+07.2g",weight)
+        }
+    }
+
+    companion object {
+        fun outer(init: Outer.() -> Unit) : String {
+            val outer = Outer()
+            outer.init()
+            return outer.show()
+        }
+    }
+}
+
+fun main() {
+    val structure =
+        DslTestbed.outer {
+            inner {
+                innerMost(weight = 45.8889)
+                innerMost(weight = -1938.4883)
+            }
+            inner {
+                innerMost(weight = 22.0048)
+                innerMost(weight = 234234.23423)
+            }
+        }
+    println(structure)
+}
+#+end_src
+
+#+RESULTS:
