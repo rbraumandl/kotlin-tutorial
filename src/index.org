@@ -558,6 +558,8 @@ Funktionen treten in den Variationen
   anonyme Funktionen
 auf.
 
+**** Basisfunktionalität
+
 Die Parameter einer Funktion müssen explizit angegebene Typen haben.
 
 #+begin_src kotlin :exports both
@@ -620,6 +622,8 @@ testToList(12)
 #+RESULTS:
 : kotlin.collections.List<kotlin.Int> = [12]
 
+**** Higher Order Functions
+
 Higher Order Functions bekommen Funktionen als Parameter oder geben
 eine Funktion zurück. Um dies zu ermöglichen, muss der Typ einer
 Funktion angegeben werden können, um z.B. damit den Typ eines
@@ -636,13 +640,142 @@ countDelegate(listOf(1,2,3), List<Int>::size)
 #+RESULTS:
 : kotlin.Int = 3
 
+Um Funktionen als Werte für Funktionstypen zu bekommen gibt es
+verschiedene Varianten:
+- Über einen Lambda Ausdruck:
+  #+begin_src kotlin :exports both
+  val testFun: (Int) -> Unit = { a -> println("Testwert: " + a) }
+  println(::testFun)
+  testFun(42)
+  #+end_src
+
+  #+RESULTS:
+  : val Line_2.testFun: (kotlin.Int) -> kotlin.Unit
+  : Testwert: 42
+  Alternativ könnte die Lambda Definition auch so aussehen, wobei
+  Kotlin hier Typinferenz anwendet soweit möglich:
+  #+begin_src kotlin :exports source
+  val testFun = { a:Int -> println("Testwert: " + a) }
+  #+end_src
+
+- Über eine anonyme Funktion:
+  #+begin_src kotlin :exports both
+  val toInt: (String) -> Int = fun(s: String): Int { return s.toIntOrNull() ?: 0 }
+  println(::toInt)
+  toInt("1")
+  #+end_src
+
+  #+RESULTS:
+  : val Line_8.toInt: (kotlin.String) -> kotlin.Int
+  : kotlin.Int = 1
+
+- Über eine Referenz auf eine bestehende Funktionsdefinition:
+  #+begin_src kotlin :exports both
+  fun apply(c: String, f: (String) -> Int) : Int = f(c)
+  apply("42",String::toInt)
+  #+end_src
+
+  #+RESULTS:
+  : kotlin.Int = 42
+  Eine Funktionsreferenz kann dabei auf eine top-level Funktion
+  (::topLevelFunction), Member oder Extension Funktion (String::toInt)
+  zeigen.
+
+- Zudem gibt es noch den etwas esoterischen Fall, dass eine Klasse
+  einen Funktionstyp implementiert, was bedeutet, dass sie ein
+  Interface mit einer Funktion implementiert, die dem Funktionstyp
+  entspricht, wobei die Funktion den Operator ~()~ überlädt (Operator
+  Overloading), der auf die Funktion ~invoke()~ abgebildet wird:
+  #+begin_src kotlin :exports both
+  class IntTransformer: (Int) -> Int {
+    override operator fun invoke(x: Int): Int = x + 1
+  }
+
+  val intFunction: (Int) -> Int = IntTransformer()
+  intFunction(5)
+  #+end_src
+
+  #+RESULTS:
+  : kotlin.Int = 6
+
+Lambda Ausdrücke und anonyme Funktionen werden als Funktionsliterale
+bezeichnet und können direkt als Ausdruck für die Übergabe von
+Funktionen verwendet werden.
+
+Ein Lamba Ausdruck ist immer in geschweiften Klammen angegeben und
+benötigt im Gegensatz zu einer Funktion mit Block kein exlizites
+return Statement. Der letzte Wert in der Abarbeitung ist der
+Rückgabewert. Die return Anweisung kann aber trotzdem verwendet werden.
+
+#+begin_src kotlin :exports both
+val lambda = { a:Int, b:Int ->
+        val c = a + b
+        val b = c*2
+        b*3
+    }
+println(lambda(2,3))
+// Default Parametername in einem Lambda ist it und die
+// Definition des Parameternamens kann dann entfallen:
+val sum = arrayOf(1,2,3).map { it * 2 }.sum()
+println(sum)
+// ein Lambda kann als letzter Parameter auch nach
+// den Parameterklammern übergeben werden:
+val foldValue = arrayOf(1,2,3).fold(10){acc, e -> acc * e}
+println(foldValue)
+#+end_src
+
+#+RESULTS:
+: 30
+: 12
+: 60
+
+Anonyme Funktionen unterscheiden sich zu Lambdas folgendermaßen:
+- Mit einer anonymen Funktion kann man den Typ des Rückgabewertes
+  angeben, falls nötig.
+- Eine ~return~ Anweisung in einem Lambda springt aus der umgebenden
+  Funktion zurück, bei einer anonymen Funktion nur aus dieser selber.
+
+Die Closure eines Lambda Ausdrucks, anonymen Funktion, lokalen
+Funktion oder Object Ausdrucks umfasst alle aus dem äußeren Scope
+zugreifbaren Variablen. Beispiel:
+#+begin_src kotlin :exports both
+var sum = 0
+val changeSum = { sum = sum + 3 }
+changeSum()
+println(sum)
+#+end_src
+
+#+RESULTS:
+: 3
+
 *** Properties	
 
+Top-level Properties unterscheiden sich von den lokalen Variablen
+bzw. den Properties in Klassen. Implementierungstechnisch werden
+top-level Properties in JVM Klassen eingebettet, die für die Source
+jeweiligen Kotlin Source Dateien erzeugt werden. 
 
+Ein top-level Property muss immer bei Deklaration initialisiert
+werden, da kein Konstruktor wie in einer Klasse die Initialisierung
+erledigen kann, bevor der erste Zugriff stattfinden kann. Eine
+Initialisierung ist auch dann notwendig, wenn der Typ der Property als
+Nullable angegeben ist. Analog bezüglich der Initialisierung zu
+top-level Properties verhalten sich auch Properties in Companion
+Objects. Auch diese müssen bei Deklaration initialisiert werden.
 
 *** Interfaces
 
 *** Klassen
+
+Klassen können enthalten:
+- Konstruktoren und Initialisierungsblöcke
+- Member Funktionen
+- Properties
+- Eingebettete Klassen (nested classes) und innere Klassen (inner
+  classes sind nested classes mit Zugriff auf das äußere Objekt)
+- Objekt Deklarationen (z.B. um Singletons zu realisieren oder
+  Companion Objekte)
+
 
 **** Properties in Klassen
 Properties in Klassen sind analog zu definieren wie top-level Properties.
@@ -757,6 +890,191 @@ t.test
 
 #+RESULTS:
 : kotlin.Int = 10
+
+**** Vererbung
+
+Die Entsprechung zur Klasse ~Object~ in Java ist in Kotlin Klasse
+~Any~. Wenn explizit keine Superklasse bei der Definition einer Klasse
+angegeben ist, erbt diese von ~Any~.
+
+Einige Regeln zur Vererbung erläutern wir in dem folgenden Beispiel.
+
+#+begin_src kotlin :exports source
+/**
+ * Ohne das Schlüsselwort <code>open</code> wäre die Klasse
+ * nicht ableitbar, d.h. final.
+ * Der primary constructor führt das Property value ein.
+ */
+open class ClassExample(var value : Int) {
+    /**
+     * Auch Properties können überschrieben werden, sind aber ebenfalls final im Default Fall:
+     * Der default Wert kann sich ändern oder ein <code>val</code> kann
+     * zum <code>var</code> werden, aber nicht andersherum.
+     * Auch die <code>get</code> und <code>set</code> Methoden können
+     * beim überschreiben geändert oder neu eingeführt oder weggelassen werden.
+     */
+    open val propVal : Double = Double.MAX_VALUE
+
+    /**
+     * Damit die Member Funktione überschrieben werden kann, muss auch sie mit <code>open</code>
+     * eingeleitet werden.
+     */
+    open fun changeValue(changer : Int) {
+        value += changer
+    }
+}
+
+/**
+ * Der primary constructor der abgeleiteten Klasse darf das Property value nicht mehr einführen,
+ * muss es aber initialisieren - daher fehlt die <em>var</em> Angabe, der Wert wird
+ * aber trotzdem initialisiert.
+ * Ohne primary constructor müssen die secondary constructors für die Initialierung
+ * von <code>value</value> sorgen.
+ * Wir markieren diese Klasse wiederum mit <code>open</code> denn ansonsten wäre sie automatisch
+ * final.
+ */
+open class DerivedClassExample(valueParam: Int) : ClassExample(valueParam) {
+    val notChangeAble : Int = valueParam
+
+    /**
+     * Wir überschreiben hier das Property. Wichtig ist noch, dass diese Änderung des Propertys
+     * nicht aktiv ist, wenn die Basisklasse initialisiert wird, was vor der abgeleiteten Klasse
+     * passiert.
+     */
+    override val propVal: Double
+        get() = super.propVal + 4.0
+
+    /**
+     * Der secondary constructor ruft den primary auf, da hier ein Aufruf <code>super(valueParam)</code>
+     * nicht erlaubt ist. Das wäre dann der Fall, wenn es in der abgeleiteten Klasse keinen primary
+     * constructor geben würde - siehe nächste Klasse.
+     */
+    constructor(valueParam: Int, notChanged: Int) : this(valueParam) {
+        value
+    }
+
+    /**
+     * Wir überschreiben die Member Funktion <code>changeValue</code> hier.
+     * Ein überschreibende Member Funktion ist in weiteren abgeleiteten Klassen ebenfalls
+     * überschreibbar, außer man markiert ist mit <code>final</code>
+     */
+    override fun changeValue(changer: Int) {
+        // nicht notwendigerweise bisheriges Verhalten nutzen:
+        super.changeValue(changer)
+        // zusätzliche Aktion:
+        value *= changer
+    }
+}
+
+/**
+ * Diese abgeleitete Klasse hat keinen primary constructor und muss daher im secondary die
+ * Basisklasse über den <coce>super(valueParam)</code> Aufruf initialisieren.
+ * Die Angabe von <code>final</code> bei der Klasse ist überflüssig, da ohne die Markierung
+ * <code>open</code> die Klasse automatisch final ist.
+ */
+final class SecondDerivedClassExample : ClassExample {
+    constructor(valueParam : Int) : super(valueParam)
+}
+#+end_src
+
+**** Interfaces
+
+Interfaces in Kotlin können Member Funktionen deklarieren als auch
+implementieren. Im ersten Fall ist die Funktion dann abstrakt markiert
+und in allen Fällen sind die Funktionen überschreibbar.
+
+Interfaces können aber im Gegensatz zu abstrakten Klassen keinen
+Zustand speichern. Es können aber Properties definiert sein, die im
+Interface selber maximal Konstanten abbilden oder generell abstrakt
+sind und in den implementierenden Klassen dann überschrieben werden.
+
+Ein Beispiel für die Nutzung von Interfaces ist unten angegeben:
+#+begin_src kotlin :exports source
+interface InterfaceExample {
+    /**
+     * Dieses Property ist abstrakt.
+     */
+    val firstProp : Int
+
+    val secondProp : Int
+    get() = 42
+
+    /**
+     * Diese Funktion ist abstrakt.
+     */
+    fun firstInterfaceFunction(param1 : Double) : Int
+
+    /**
+     * Diese Funktion
+     */
+    fun secondInterfaceFunction(param1 : Int, param2 : Double) : Int {
+        return param1 * firstInterfaceFunction(param2)
+    }
+}
+
+/**
+ * Wir überschreiben das erste Property mit dem primary constructor
+ * das erste Property des Interfaces.
+ */
+class ImplementInterface(override val firstProp : Int = 55) : InterfaceExample {
+
+    override val secondProp: Int
+        get() = super.secondProp + firstProp
+
+    /**
+     * Wir überschreiben die abstrakte Funktion.
+     */
+    override fun firstInterfaceFunction(param1: Double): Int {
+        return param1.toInt()
+    }
+
+    /**
+     * Wir überschreiben auch nicht notwendigerweise die implementierte Funktion.
+     */
+    override fun secondInterfaceFunction(param1: Int, param2: Double): Int {
+        return super.secondInterfaceFunction(param1, param2) + 2
+    }
+}
+#+end_src
+
+**** Extensions
+
+Kotlin bietet auch die Möglichkeit zu Klassen Memberfunktionen
+hinzuzufügen, obwohl diese Klassen eigentlich nicht änderbar sind, da
+sie zum Beispiel aus einer von extern eingebundenen Bibliothek
+stammen. Analog lassen sich auch Properties hinzufügen, wobei hier
+aber kein separater Zustand (also ein ~backing field~ dazu fehlt)
+speicherbar ist und der Wert des Properties entweder konstant oder
+errechnet ist.
+
+Beispiele sind unten angegeben:
+#+begin_src kotlin :exports source
+/**
+ * Wir werden diese Klasse per Extensions erweitern (auch wenn wir die Klasse
+ * hier direkt im Zugriff haben und nicht auf diesen Mechanismus angewiesen wären.
+ */
+class ExtensionExample(var memberVar : Int = 4) {
+}
+
+/**
+ * Erweiterung um diese Funktion.
+ */
+fun ExtensionExample.extendFun() {
+    this.memberVar = 5
+}
+
+/**
+ * Erweiterung um dieses Property
+ */
+val ExtensionExample.extMemberVar : Double
+get() = 4.5
+
+fun main() {
+    val ext = ExtensionExample()
+    println(ext.extMemberVar)
+    println(ext.extendFun())
+}
+#+end_src
 
 ** Organisation von Source Code
 

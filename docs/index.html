@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="de" xml:lang="de">
 <head>
-<!-- 2021-04-17 Sa 20:09 -->
+<!-- 2021-04-18 So 16:25 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Kotlin Tutorial</title>
@@ -989,7 +989,11 @@ anonyme Funktionen</li>
 <p>
 auf.
 </p>
+</div>
 
+<div id="outline-container-orgdd6c59f" class="outline-5">
+<h5 id="orgdd6c59f">Basisfunktionalität</h5>
+<div class="outline-text-5" id="text-orgdd6c59f">
 <p>
 Die Parameter einer Funktion müssen explizit angegebene Typen haben.
 </p>
@@ -1071,8 +1075,12 @@ testToList(12)
 <pre class="example">
 kotlin.collections.List&lt;kotlin.Int&gt; = [12]
 </pre>
+</div>
+</div>
 
-
+<div id="outline-container-org1347efe" class="outline-5">
+<h5 id="org1347efe">Higher Order Functions</h5>
+<div class="outline-text-5" id="text-org1347efe">
 <p>
 Higher Order Functions bekommen Funktionen als Parameter oder geben
 eine Funktion zurück. Um dies zu ermöglichen, muss der Typ einer
@@ -1092,14 +1100,182 @@ countDelegate(listOf(1,2,3), <span style="color: #228b22;">List&lt;Int&gt;</span
 <pre class="example">
 kotlin.Int = 3
 </pre>
+
+
+<p>
+Um Funktionen als Werte für Funktionstypen zu bekommen gibt es
+verschiedene Varianten:
+</p>
+<ul class="org-ul">
+<li><p>
+Über einen Lambda Ausdruck:
+</p>
+<div class="org-src-container">
+<pre class="src src-kotlin"><span style="color: #a020f0;">val</span> <span style="color: #a0522d;">testFun</span>: (<span style="color: #228b22;">Int</span>) -&gt; <span style="color: #228b22;">Unit</span> = { a -&gt; println(<span style="color: #8b2252;">"Testwert: "</span> + a) }
+println(::testFun)
+testFun(42)
+</pre>
+</div>
+
+<pre class="example">
+val Line_52.testFun: (kotlin.Int) -&gt; kotlin.Unit
+Testwert: 42
+</pre>
+
+<p>
+Alternativ könnte die Lambda Definition auch so aussehen, wobei
+Kotlin hier Typinferenz anwendet soweit möglich:
+</p>
+<div class="org-src-container">
+<pre class="src src-kotlin"><span style="color: #a020f0;">val</span> <span style="color: #a0522d;">testFun</span> = { a:<span style="color: #228b22;">Int</span> -&gt; println(<span style="color: #8b2252;">"Testwert: "</span> + a) }
+</pre>
+</div></li>
+
+<li><p>
+Über eine anonyme Funktion:
+</p>
+<div class="org-src-container">
+<pre class="src src-kotlin"><span style="color: #a020f0;">val</span> <span style="color: #a0522d;">toInt</span>: (<span style="color: #228b22;">String</span>) -&gt; <span style="color: #228b22;">Int</span> = <span style="color: #a020f0;">fun</span>(s: <span style="color: #228b22;">String</span>): <span style="color: #228b22;">Int</span> { <span style="color: #a020f0;">return</span> s.toIntOrNull() ?: 0 }
+println(::toInt)
+toInt(<span style="color: #8b2252;">"1"</span>)
+</pre>
+</div>
+
+<pre class="example">
+val Line_54.toInt: (kotlin.String) -&gt; kotlin.Int
+kotlin.Int = 1
+</pre></li>
+
+<li><p>
+Über eine Referenz auf eine bestehende Funktionsdefinition:
+</p>
+<div class="org-src-container">
+<pre class="src src-kotlin"><span style="color: #a020f0;">fun</span> <span style="color: #0000ff;">apply</span>(c: <span style="color: #228b22;">String</span>, f: (<span style="color: #228b22;">String</span>) -&gt; <span style="color: #228b22;">Int</span>) : <span style="color: #228b22;">Int</span> = f(c)
+apply(<span style="color: #8b2252;">"42"</span>,<span style="color: #228b22;">String</span>::toInt)
+</pre>
+</div>
+
+<pre class="example">
+kotlin.Int = 42
+</pre>
+
+<p>
+Eine Funktionsreferenz kann dabei auf eine top-level Funktion
+(::topLevelFunction), Member oder Extension Funktion (String::toInt)
+zeigen.
+</p></li>
+
+<li><p>
+Zudem gibt es noch den etwas esoterischen Fall, dass eine Klasse
+einen Funktionstyp implementiert, was bedeutet, dass sie ein
+Interface mit einer Funktion implementiert, die dem Funktionstyp
+entspricht, wobei die Funktion den Operator <code>()</code> überlädt (Operator
+Overloading), der auf die Funktion <code>invoke()</code> abgebildet wird:
+</p>
+<div class="org-src-container">
+<pre class="src src-kotlin"><span style="color: #a020f0;">class</span> <span style="color: #228b22;">IntTransformer</span>: (<span style="color: #228b22;">Int</span>) -&gt; <span style="color: #228b22;">Int</span> {
+  <span style="color: #a020f0;">override</span> <span style="color: #a020f0;">operator</span> <span style="color: #a020f0;">fun</span> <span style="color: #0000ff;">invoke</span>(x: <span style="color: #228b22;">Int</span>): <span style="color: #228b22;">Int</span> = x + 1
+}
+
+<span style="color: #a020f0;">val</span> <span style="color: #a0522d;">intFunction</span>: (<span style="color: #228b22;">Int</span>) -&gt; <span style="color: #228b22;">Int</span> = <span style="color: #228b22;">IntTransformer</span>()
+intFunction(5)
+</pre>
+</div>
+
+<pre class="example">
+kotlin.Int = 6
+</pre></li>
+</ul>
+
+<p>
+Lambda Ausdrücke und anonyme Funktionen werden als Funktionsliterale
+bezeichnet und können direkt als Ausdruck für die Übergabe von
+Funktionen verwendet werden.
+</p>
+
+<p>
+Ein Lamba Ausdruck ist immer in geschweiften Klammen angegeben und
+benötigt im Gegensatz zu einer Funktion mit Block kein exlizites
+return Statement. Der letzte Wert in der Abarbeitung ist der
+Rückgabewert. Die return Anweisung kann aber trotzdem verwendet werden.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-kotlin"><span style="color: #a020f0;">val</span> <span style="color: #a0522d;">lambda</span> = { a:<span style="color: #228b22;">Int</span>, b:<span style="color: #228b22;">Int</span> -&gt;
+        <span style="color: #a020f0;">val</span> <span style="color: #a0522d;">c</span> = a + b
+        <span style="color: #a020f0;">val</span> <span style="color: #a0522d;">b</span> = c*2
+        b*3
+    }
+println(lambda(2,3))
+<span style="color: #b22222;">// </span><span style="color: #b22222;">Default Parametername in einem Lambda ist it und die</span>
+<span style="color: #b22222;">// </span><span style="color: #b22222;">Definition des Parameternamens kann dann entfallen:</span>
+<span style="color: #a020f0;">val</span> <span style="color: #a0522d;">sum</span> = arrayOf(1,2,3).map { <span style="color: #a020f0;">it</span> * 2 }.sum()
+println(sum)
+<span style="color: #b22222;">// </span><span style="color: #b22222;">ein Lambda kann als letzter Parameter auch nach</span>
+<span style="color: #b22222;">// </span><span style="color: #b22222;">den Parameterklammern &#252;bergeben werden:</span>
+<span style="color: #a020f0;">val</span> <span style="color: #a0522d;">foldValue</span> = arrayOf(1,2,3).fold(10){acc, e -&gt; acc * e}
+println(foldValue)
+</pre>
+</div>
+
+<pre class="example">
+30
+12
+60
+</pre>
+
+
+<p>
+Anonyme Funktionen unterscheiden sich zu Lambdas folgendermaßen:
+</p>
+<ul class="org-ul">
+<li>Mit einer anonymen Funktion kann man den Typ des Rückgabewertes
+angeben, falls nötig.</li>
+<li>Eine <code>return</code> Anweisung in einem Lambda springt aus der umgebenden
+Funktion zurück, bei einer anonymen Funktion nur aus dieser selber.</li>
+</ul>
+
+<p>
+Die Closure eines Lambda Ausdrucks, anonymen Funktion, lokalen
+Funktion oder Object Ausdrucks umfasst alle aus dem äußeren Scope
+zugreifbaren Variablen. Beispiel:
+</p>
+<div class="org-src-container">
+<pre class="src src-kotlin"><span style="color: #a020f0;">var</span> <span style="color: #a0522d;">sum</span> = 0
+<span style="color: #a020f0;">val</span> <span style="color: #a0522d;">changeSum</span> = { sum = sum + 3 }
+changeSum()
+println(sum)
+</pre>
+</div>
+
+<pre class="example">
+3
+</pre>
+</div>
 </div>
 </div>
 
 <div id="outline-container-orgd1364c3" class="outline-4">
 <h4 id="orgd1364c3">Properties</h4>
+<div class="outline-text-4" id="text-orgd1364c3">
+<p>
+Top-level Properties unterscheiden sich von den lokalen Variablen
+bzw. den Properties in Klassen. Implementierungstechnisch werden
+top-level Properties in JVM Klassen eingebettet, die für die Source
+jeweiligen Kotlin Source Dateien erzeugt werden. 
+</p>
+
+<p>
+Ein top-level Property muss immer bei Deklaration initialisiert
+werden, da kein Konstruktor wie in einer Klasse die Initialisierung
+erledigen kann, bevor der erste Zugriff stattfinden kann. Eine
+Initialisierung ist auch dann notwendig, wenn der Typ der Property als
+Nullable angegeben ist. Analog bezüglich der Initialisierung zu
+top-level Properties verhalten sich auch Properties in Companion
+Objects. Auch diese müssen bei Deklaration initialisiert werden.
+</p>
 </div>
-
-
+</div>
 
 <div id="outline-container-org7040771" class="outline-4">
 <h4 id="org7040771">Interfaces</h4>
@@ -1108,7 +1284,21 @@ kotlin.Int = 3
 <div id="outline-container-org2b43337" class="outline-4">
 <h4 id="org2b43337">Klassen</h4>
 <div class="outline-text-4" id="text-org2b43337">
+<p>
+Klassen können enthalten:
+</p>
+<ul class="org-ul">
+<li>Konstruktoren und Initialisierungsblöcke</li>
+<li>Member Funktionen</li>
+<li>Properties</li>
+<li>Eingebettete Klassen (nested classes) und innere Klassen (inner
+classes sind nested classes mit Zugriff auf das äußere Objekt)</li>
+<li>Objekt Deklarationen (z.B. um Singletons zu realisieren oder
+Companion Objekte)</li>
+</ul>
 </div>
+
+
 <div id="outline-container-org58c06fb" class="outline-5">
 <h5 id="org58c06fb">Properties in Klassen</h5>
 <div class="outline-text-5" id="text-org58c06fb">
@@ -1265,6 +1455,217 @@ kotlin.Int = 10
 </pre>
 </div>
 </div>
+
+<div id="outline-container-org72d0a54" class="outline-5">
+<h5 id="org72d0a54">Vererbung</h5>
+<div class="outline-text-5" id="text-org72d0a54">
+<p>
+Die Entsprechung zur Klasse <code>Object</code> in Java ist in Kotlin Klasse
+<code>Any</code>. Wenn explizit keine Superklasse bei der Definition einer Klasse
+angegeben ist, erbt diese von <code>Any</code>.
+</p>
+
+<p>
+Einige Regeln zur Vererbung erläutern wir in dem folgenden Beispiel.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-kotlin"><span style="color: #b22222;">/**</span>
+<span style="color: #b22222;"> * Ohne das Schl&#252;sselwort &lt;code&gt;open&lt;/code&gt; w&#228;re die Klasse</span>
+<span style="color: #b22222;"> * nicht ableitbar, d.h. final.</span>
+<span style="color: #b22222;"> * Der primary constructor f&#252;hrt das Property value ein.</span>
+<span style="color: #b22222;"> */</span>
+<span style="color: #a020f0;">open</span> <span style="color: #a020f0;">class</span> <span style="color: #228b22;">ClassExample</span>(<span style="color: #a020f0;">var</span> <span style="color: #a0522d;">value</span> : <span style="color: #228b22;">Int</span>) {
+    <span style="color: #b22222;">/**</span>
+<span style="color: #b22222;">     * Auch Properties k&#246;nnen &#252;berschrieben werden, sind aber ebenfalls final im Default Fall:</span>
+<span style="color: #b22222;">     * Der default Wert kann sich &#228;ndern oder ein &lt;code&gt;val&lt;/code&gt; kann</span>
+<span style="color: #b22222;">     * zum &lt;code&gt;var&lt;/code&gt; werden, aber nicht andersherum.</span>
+<span style="color: #b22222;">     * Auch die &lt;code&gt;get&lt;/code&gt; und &lt;code&gt;set&lt;/code&gt; Methoden k&#246;nnen</span>
+<span style="color: #b22222;">     * beim &#252;berschreiben ge&#228;ndert oder neu eingef&#252;hrt oder weggelassen werden.</span>
+<span style="color: #b22222;">     */</span>
+    <span style="color: #a020f0;">open</span> <span style="color: #a020f0;">val</span> <span style="color: #a0522d;">propVal</span> : <span style="color: #228b22;">Double</span> = <span style="color: #228b22;">Double.MAX_VALUE</span>
+
+    <span style="color: #b22222;">/**</span>
+<span style="color: #b22222;">     * Damit die Member Funktione &#252;berschrieben werden kann, muss auch sie mit &lt;code&gt;open&lt;/code&gt;</span>
+<span style="color: #b22222;">     * eingeleitet werden.</span>
+<span style="color: #b22222;">     */</span>
+    <span style="color: #a020f0;">open</span> <span style="color: #a020f0;">fun</span> <span style="color: #0000ff;">changeValue</span>(changer : <span style="color: #228b22;">Int</span>) {
+        value += changer
+    }
+}
+
+<span style="color: #b22222;">/**</span>
+<span style="color: #b22222;"> * Der primary constructor der abgeleiteten Klasse darf das Property value nicht mehr einf&#252;hren,</span>
+<span style="color: #b22222;"> * muss es aber initialisieren - daher fehlt die &lt;em&gt;var&lt;/em&gt; Angabe, der Wert wird</span>
+<span style="color: #b22222;"> * aber trotzdem initialisiert.</span>
+<span style="color: #b22222;"> * Ohne primary constructor m&#252;ssen die secondary constructors f&#252;r die Initialierung</span>
+<span style="color: #b22222;"> * von &lt;code&gt;value&lt;/value&gt; sorgen.</span>
+<span style="color: #b22222;"> * Wir markieren diese Klasse wiederum mit &lt;code&gt;open&lt;/code&gt; denn ansonsten w&#228;re sie automatisch</span>
+<span style="color: #b22222;"> * final.</span>
+<span style="color: #b22222;"> */</span>
+<span style="color: #a020f0;">open</span> <span style="color: #a020f0;">class</span> <span style="color: #228b22;">DerivedClassExample</span>(valueParam: <span style="color: #228b22;">Int</span>) : <span style="color: #228b22;">ClassExample</span>(valueParam) {
+    <span style="color: #a020f0;">val</span> <span style="color: #a0522d;">notChangeAble</span> : <span style="color: #228b22;">Int</span> = valueParam
+
+    <span style="color: #b22222;">/**</span>
+<span style="color: #b22222;">     * Wir &#252;berschreiben hier das Property. Wichtig ist noch, dass diese &#196;nderung des Propertys</span>
+<span style="color: #b22222;">     * nicht aktiv ist, wenn die Basisklasse initialisiert wird, was vor der abgeleiteten Klasse</span>
+<span style="color: #b22222;">     * passiert.</span>
+<span style="color: #b22222;">     */</span>
+    <span style="color: #a020f0;">override</span> <span style="color: #a020f0;">val</span> <span style="color: #a0522d;">propVal</span>: <span style="color: #228b22;">Double</span>
+        <span style="color: #a020f0;">get</span>() = <span style="color: #a020f0;">super</span>.propVal + 4.0
+
+    <span style="color: #b22222;">/**</span>
+<span style="color: #b22222;">     * Der secondary constructor ruft den primary auf, da hier ein Aufruf &lt;code&gt;super(valueParam)&lt;/code&gt;</span>
+<span style="color: #b22222;">     * nicht erlaubt ist. Das w&#228;re dann der Fall, wenn es in der abgeleiteten Klasse keinen primary</span>
+<span style="color: #b22222;">     * constructor geben w&#252;rde - siehe n&#228;chste Klasse.</span>
+<span style="color: #b22222;">     */</span>
+    <span style="color: #a020f0;">constructor</span>(valueParam: <span style="color: #228b22;">Int</span>, notChanged: <span style="color: #228b22;">Int</span>) : <span style="color: #a020f0;">this</span>(valueParam) {
+        value
+    }
+
+    <span style="color: #b22222;">/**</span>
+<span style="color: #b22222;">     * Wir &#252;berschreiben die Member Funktion &lt;code&gt;changeValue&lt;/code&gt; hier.</span>
+<span style="color: #b22222;">     * Ein &#252;berschreibende Member Funktion ist in weiteren abgeleiteten Klassen ebenfalls</span>
+<span style="color: #b22222;">     * &#252;berschreibbar, au&#223;er man markiert ist mit &lt;code&gt;final&lt;/code&gt;</span>
+<span style="color: #b22222;">     */</span>
+    <span style="color: #a020f0;">override</span> <span style="color: #a020f0;">fun</span> <span style="color: #0000ff;">changeValue</span>(changer: <span style="color: #228b22;">Int</span>) {
+        <span style="color: #b22222;">// </span><span style="color: #b22222;">nicht notwendigerweise bisheriges Verhalten nutzen:</span>
+        <span style="color: #a020f0;">super</span>.changeValue(changer)
+        <span style="color: #b22222;">// </span><span style="color: #b22222;">zus&#228;tzliche Aktion:</span>
+        value *= changer
+    }
+}
+
+<span style="color: #b22222;">/**</span>
+<span style="color: #b22222;"> * Diese abgeleitete Klasse hat keinen primary constructor und muss daher im secondary die</span>
+<span style="color: #b22222;"> * Basisklasse &#252;ber den &lt;coce&gt;super(valueParam)&lt;/code&gt; Aufruf initialisieren.</span>
+<span style="color: #b22222;"> * Die Angabe von &lt;code&gt;final&lt;/code&gt; bei der Klasse ist &#252;berfl&#252;ssig, da ohne die Markierung</span>
+<span style="color: #b22222;"> * &lt;code&gt;open&lt;/code&gt; die Klasse automatisch final ist.</span>
+<span style="color: #b22222;"> */</span>
+<span style="color: #a020f0;">final</span> <span style="color: #a020f0;">class</span> <span style="color: #228b22;">SecondDerivedClassExample</span> : <span style="color: #228b22;">ClassExample</span> {
+    <span style="color: #a020f0;">constructor</span>(valueParam : <span style="color: #228b22;">Int</span>) : <span style="color: #a020f0;">super</span>(valueParam)
+}
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgcb78b13" class="outline-5">
+<h5 id="orgcb78b13">Interfaces</h5>
+<div class="outline-text-5" id="text-orgcb78b13">
+<p>
+Interfaces in Kotlin können Member Funktionen deklarieren als auch
+implementieren. Im ersten Fall ist die Funktion dann abstrakt markiert
+und in allen Fällen sind die Funktionen überschreibbar.
+</p>
+
+<p>
+Interfaces können aber im Gegensatz zu abstrakten Klassen keinen
+Zustand speichern. Es können aber Properties definiert sein, die im
+Interface selber maximal Konstanten abbilden oder generell abstrakt
+sind und in den implementierenden Klassen dann überschrieben werden.
+</p>
+
+<p>
+Ein Beispiel für die Nutzung von Interfaces ist unten angegeben:
+</p>
+<div class="org-src-container">
+<pre class="src src-kotlin"><span style="color: #a020f0;">interface</span> <span style="color: #228b22;">InterfaceExample</span> {
+    <span style="color: #b22222;">/**</span>
+<span style="color: #b22222;">     * Dieses Property ist abstrakt.</span>
+<span style="color: #b22222;">     */</span>
+    <span style="color: #a020f0;">val</span> <span style="color: #a0522d;">firstProp</span> : <span style="color: #228b22;">Int</span>
+
+    <span style="color: #a020f0;">val</span> <span style="color: #a0522d;">secondProp</span> : <span style="color: #228b22;">Int</span>
+    <span style="color: #a020f0;">get</span>() = 42
+
+    <span style="color: #b22222;">/**</span>
+<span style="color: #b22222;">     * Diese Funktion ist abstrakt.</span>
+<span style="color: #b22222;">     */</span>
+    <span style="color: #a020f0;">fun</span> <span style="color: #0000ff;">firstInterfaceFunction</span>(param1 : <span style="color: #228b22;">Double</span>) : <span style="color: #228b22;">Int</span>
+
+    <span style="color: #b22222;">/**</span>
+<span style="color: #b22222;">     * Diese Funktion</span>
+<span style="color: #b22222;">     */</span>
+    <span style="color: #a020f0;">fun</span> <span style="color: #0000ff;">secondInterfaceFunction</span>(param1 : <span style="color: #228b22;">Int</span>, param2 : <span style="color: #228b22;">Double</span>) : <span style="color: #228b22;">Int</span> {
+        <span style="color: #a020f0;">return</span> param1 * firstInterfaceFunction(param2)
+    }
+}
+
+<span style="color: #b22222;">/**</span>
+<span style="color: #b22222;"> * Wir &#252;berschreiben das erste Property mit dem primary constructor</span>
+<span style="color: #b22222;"> * das erste Property des Interfaces.</span>
+<span style="color: #b22222;"> */</span>
+<span style="color: #a020f0;">class</span> <span style="color: #228b22;">ImplementInterface</span>(<span style="color: #a020f0;">override</span> <span style="color: #a020f0;">val</span> <span style="color: #a0522d;">firstProp</span> : <span style="color: #228b22;">Int</span> = 55) : <span style="color: #228b22;">InterfaceExample</span> {
+
+    <span style="color: #a020f0;">override</span> <span style="color: #a020f0;">val</span> <span style="color: #a0522d;">secondProp</span>: <span style="color: #228b22;">Int</span>
+        <span style="color: #a020f0;">get</span>() = <span style="color: #a020f0;">super</span>.secondProp + firstProp
+
+    <span style="color: #b22222;">/**</span>
+<span style="color: #b22222;">     * Wir &#252;berschreiben die abstrakte Funktion.</span>
+<span style="color: #b22222;">     */</span>
+    <span style="color: #a020f0;">override</span> <span style="color: #a020f0;">fun</span> <span style="color: #0000ff;">firstInterfaceFunction</span>(param1: <span style="color: #228b22;">Double</span>): <span style="color: #228b22;">Int</span> {
+        <span style="color: #a020f0;">return</span> param1.toInt()
+    }
+
+    <span style="color: #b22222;">/**</span>
+<span style="color: #b22222;">     * Wir &#252;berschreiben auch nicht notwendigerweise die implementierte Funktion.</span>
+<span style="color: #b22222;">     */</span>
+    <span style="color: #a020f0;">override</span> <span style="color: #a020f0;">fun</span> <span style="color: #0000ff;">secondInterfaceFunction</span>(param1: <span style="color: #228b22;">Int</span>, param2: <span style="color: #228b22;">Double</span>): <span style="color: #228b22;">Int</span> {
+        <span style="color: #a020f0;">return</span> <span style="color: #a020f0;">super</span>.secondInterfaceFunction(param1, param2) + 2
+    }
+}
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgc123311" class="outline-5">
+<h5 id="orgc123311">Extensions</h5>
+<div class="outline-text-5" id="text-orgc123311">
+<p>
+Kotlin bietet auch die Möglichkeit zu Klassen Memberfunktionen
+hinzuzufügen, obwohl diese Klassen eigentlich nicht änderbar sind, da
+sie zum Beispiel aus einer von extern eingebundenen Bibliothek
+stammen. Analog lassen sich auch Properties hinzufügen, wobei hier
+aber kein separater Zustand (also ein <code>backing field</code> dazu fehlt)
+speicherbar ist und der Wert des Properties entweder konstant oder
+errechnet ist.
+</p>
+
+<p>
+Beispiele sind unten angegeben:
+</p>
+<div class="org-src-container">
+<pre class="src src-kotlin"><span style="color: #b22222;">/**</span>
+<span style="color: #b22222;"> * Wir werden diese Klasse per Extensions erweitern (auch wenn wir die Klasse</span>
+<span style="color: #b22222;"> * hier direkt im Zugriff haben und nicht auf diesen Mechanismus angewiesen w&#228;ren.</span>
+<span style="color: #b22222;"> */</span>
+<span style="color: #a020f0;">class</span> <span style="color: #228b22;">ExtensionExample</span>(<span style="color: #a020f0;">var</span> <span style="color: #a0522d;">memberVar</span> : <span style="color: #228b22;">Int</span> = 4) {
+}
+
+<span style="color: #b22222;">/**</span>
+<span style="color: #b22222;"> * Erweiterung um diese Funktion.</span>
+<span style="color: #b22222;"> */</span>
+<span style="color: #a020f0;">fun</span> <span style="color: #228b22;">ExtensionExample.extendFun</span>() {
+    <span style="color: #a020f0;">this</span>.memberVar = 5
+}
+
+<span style="color: #b22222;">/**</span>
+<span style="color: #b22222;"> * Erweiterung um dieses Property</span>
+<span style="color: #b22222;"> */</span>
+<span style="color: #a020f0;">val</span> <span style="color: #a0522d;">ExtensionExample</span><span style="color: #228b22;">.extMemberVar</span> : <span style="color: #228b22;">Double</span>
+<span style="color: #a020f0;">get</span>() = 4.5
+
+<span style="color: #a020f0;">fun</span> <span style="color: #0000ff;">main</span>() {
+    <span style="color: #a020f0;">val</span> <span style="color: #a0522d;">ext</span> = <span style="color: #228b22;">ExtensionExample</span>()
+    println(ext.extMemberVar)
+    println(ext.extendFun())
+}
+</pre>
+</div>
+</div>
+</div>
 </div>
 </div>
 
@@ -1414,7 +1815,7 @@ verwendet.</li>
 </div>
 <div id="postamble" class="status">
 <p class="author">Autor: Reinhard Braumandl</p>
-<p class="date">Created: 2021-04-17 Sa 20:09</p>
+<p class="date">Created: 2021-04-18 So 16:25</p>
 <p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
 </body>
