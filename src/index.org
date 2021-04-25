@@ -517,12 +517,106 @@ doublearray.forEach{ da -> println(da) }
 
 Da Kotlin sich viele Anleihen aus dem Bereich der funktionalen
 Programmierung genommen, sind anders als in Java angepasste Varianten
-von Anweisungen auch in Form von Ausdrücken verwendbar.
+von Anweisungen auch in Form von Ausdrücken verwendbar. Im Kotlin
+Sprachgebrauch sind alle üblichen Anweisungen imperativer,
+objekt-orientierter Programmiersprachen Ausdrücke. 
 
 #+begin_note
 Anmerkung: Ausdrücke liefern Werte - Anweisungen nicht, sie
 ändern nur den Kontrollfluss.
 #+end_note
+
+*** If Anweisung/Ausdruck
+
+Wenn ein ~if~ Ausdruck in keinem Zweig explizit einen Wert liefert,
+dann ist der Typ des gesamten ~if~ Ausdrucks ~Unit~ (vergleichbar mit
+void in Java) und hat somit keinen Wert. In dieser Form gleicht die
+Verwendung der einer Anweisung. 
+
+#+begin_src kotlin :exports both
+// etwas Heck-meck, um den Typ des if Ausdrucks zu sehen
+var value = 4
+val aFun = fun() = if (2 < 1) value = 5 else value = 3
+aFun
+#+end_src
+
+#+RESULTS:
+: {Comparable<*> & Number} = 1
+
+Wenn die beiden Zweige von if unterschiedliche Typen
+zurückgeben, wir der Gesamtrückgabe-Typ so bestimmt, dass ein
+möglichst eng eingegrenzter Typ ausgewählt wird. Im Extremfall kann
+der Typ dann auch ~Any~ sein.
+#+begin_src kotlin :exports both
+if (1 < 2) 1 else 1.0
+#+end_src
+
+#+RESULTS:
+: {Comparable<*> & Number} = 1
+
+Wenn der Wert des ~if~ Ausdrucks verwendet wird, muss der ~else~ Zweig
+immer vorhanden sein.
+#+begin_src kotlin :exports source
+val aValue = if (1 < 2) 5 else 4 // OK
+aValue = if (1 < 2) 5 // Fehler
+#+end_src
+
+*** When Anweisung/Ausdruck
+
+Ein ~when~ Ausdruck ähnelt der ~switch~ Anweisung wie man sie aus Java
+kennt. Analog dazu werden in einem ~when~ Ausdruck die angegebenen
+Bedingungen in der Reihenfolge ihres Auftretens geprüft und der Zweig
+der Bedingung ausgeführt, die als erste zu ~true~ evaluiert wird. Der
+optionale ~else~ Zweig wird ausgeführt, falls keine der Bedingungen
+zutrifft. Der ~else~ Zweig muss zwingend angegeben werden, wenn ~when~
+als Ausdruck verwendet wird und der Compiler nicht erkennen kann, dass
+eine der Bedingungen zutreffen muss, was z.B. bei der Prüfung auf
+~Enum~ der Fall sein kann.
+
+#+begin_src kotlin :exports both
+val x = 5
+val y = 4
+// Verwendung als Ausdruck:
+val result = 
+when (x) {
+  1    -> "ist eins"
+  2, 3 -> "ist zwei oder drei"
+  y + 1 -> "eins mehr als y" // Bedingung kann Ausdruck sein
+  else -> "weiß nicht" // else zwingend wegen Nutzung als Ausdruck
+}
+result
+#+end_src
+
+#+RESULTS:
+: kotlin.String = eins mehr als y
+
+Die Bedingungen in dem ~when~ Ausdruck können auch recht komplex sein:
+#+begin_src kotlin :exports both
+val x = 5
+when (x) {
+  in 1..10 -> println("in range")
+  !in 10..20 -> println("out of range")
+  is Number -> println("ist vom Typ String") // Typ muss zuweisungskompatibel mit x sein
+  // hier lassen wir else mal weg, was aber schlechter Stil ist
+}
+#+end_src
+
+#+RESULTS:
+: in range
+
+Der ~when~ Ausdruck lässt sich auch ohne Eingabewert verwenden und
+stellt damit ein mächtigeres ~if~ Konstrukt zur Verfügung:
+#+begin_src kotlin :exports both
+val x = 5
+val y = 3
+when {
+  x > 4 -> "x größer 4"
+  y < 4 -> "y kleiner 4"
+  else "weiß nicht"
+}
+#+end_src
+
+
 
 * Grundkonstruktion von Programmen
 
