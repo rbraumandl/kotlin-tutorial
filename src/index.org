@@ -1170,6 +1170,25 @@ fun main() {
 }
 #+end_src
 
+**** Data Klassen
+     In Anwendungsfällen wie z.B. Datentransferobjekte (DTO) benötigt
+     man eine Klasse nur, um Daten zu transportieren, aber Logik muss
+     in der Klasse so gut wie gar nicht untergebracht werden. Daher
+     gibt es in Kotlin die ~data classes~, die im ~primary
+     constructor~ die Properties der Klasse aufführen, für die dann
+     automatisiert Code für ~toString()~, ~equals()~, ~hashCode()~,
+     ~copy()~ und die Komponenten Funktionen für die Unterstützung von
+     Destructuring Declarations erzeugt wird.
+
+     #+begin_src kotlin :exports both
+       data class MyData(val aMember : Int, val bMember : Double)
+       val myData = MyData(4,45.0)
+       println(myData) // hier greift die erzeugte toString() Methode
+     #+end_src
+
+     #+RESULTS:
+     : MyData(aMember=4, bMember=45.0)
+
 ** Organisation von Source Code
 
 In diesem Abschnitt beschäftigen wir uns mit der Frage, wie man die
