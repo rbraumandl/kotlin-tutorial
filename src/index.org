@@ -612,9 +612,12 @@ val y = 3
 when {
   x > 4 -> "x größer 4"
   y < 4 -> "y kleiner 4"
-  else "weiß nicht"
+  else -> "weiß nicht"
 }
 #+end_src
+
+#+RESULTS:
+: kotlin.String = x größer 4
 
 
 
@@ -1188,6 +1191,19 @@ fun main() {
 
      #+RESULTS:
      : MyData(aMember=4, bMember=45.0)
+
+     Eine ~copy()~ Funktion kann genutzt werden, um in sehr kurzer Form
+     eine Kopie eines bestehenden Objekts anzulegen und bei Bedard dabei wenige
+     Properties zu ändern.
+#+begin_src kotlin :exports both
+data class MyData(val aMember : Int, val bMember : Double)
+val objMyData = MyData(4, 4.5)
+val copiedMyData = objMyData.copy(bMember = 5.5)
+println(copiedMyData)
+#+end_src
+
+#+RESULTS:
+: MyData(aMember=4, bMember=5.5)
 
 ** Organisation von Source Code
 

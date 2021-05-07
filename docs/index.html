@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="de" xml:lang="de">
 <head>
-<!-- 2021-04-18 So 16:25 -->
+<!-- 2021-05-01 Sa 16:22 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Kotlin Tutorial</title>
@@ -924,7 +924,9 @@ doublearray.forEach{ da -&gt; println(da) }
 <p>
 Da Kotlin sich viele Anleihen aus dem Bereich der funktionalen
 Programmierung genommen, sind anders als in Java angepasste Varianten
-von Anweisungen auch in Form von Ausdrücken verwendbar.
+von Anweisungen auch in Form von Ausdrücken verwendbar. Im Kotlin
+Sprachgebrauch sind alle üblichen Anweisungen imperativer,
+objekt-orientierter Programmiersprachen Ausdrücke. 
 </p>
 
 <div class="note">
@@ -935,8 +937,136 @@ Anmerkung: Ausdrücke liefern Werte - Anweisungen nicht, sie
 
 </div>
 </div>
+
+<div id="outline-container-orgc45e8bb" class="outline-4">
+<h4 id="orgc45e8bb">If Anweisung/Ausdruck</h4>
+<div class="outline-text-4" id="text-orgc45e8bb">
+<p>
+Wenn ein <code>if</code> Ausdruck in keinem Zweig explizit einen Wert liefert,
+dann ist der Typ des gesamten <code>if</code> Ausdrucks <code>Unit</code> (vergleichbar mit
+void in Java) und hat somit keinen Wert. In dieser Form gleicht die
+Verwendung der einer Anweisung. 
+</p>
+
+<div class="org-src-container">
+<pre class="src src-kotlin"><span style="color: #b22222;">// </span><span style="color: #b22222;">etwas Heck-meck, um den Typ des if Ausdrucks zu sehen</span>
+<span style="color: #a020f0;">var</span> <span style="color: #a0522d;">value</span> = 4
+<span style="color: #a020f0;">val</span> <span style="color: #a0522d;">aFun</span> = <span style="color: #a020f0;">fun</span>() = <span style="color: #a020f0;">if</span> (2 &lt; 1) value = 5 <span style="color: #a020f0;">else</span> value = 3
+aFun
+</pre>
+</div>
+
+<pre class="example">
+() -&gt; kotlin.Unit = () -&gt; kotlin.Unit
+</pre>
+
+
+<p>
+Wenn die beiden Zweige von if unterschiedliche Typen
+zurückgeben, wir der Gesamtrückgabe-Typ so bestimmt, dass ein
+möglichst eng eingegrenzter Typ ausgewählt wird. Im Extremfall kann
+der Typ dann auch <code>Any</code> sein.
+</p>
+<div class="org-src-container">
+<pre class="src src-kotlin"><span style="color: #a020f0;">if</span> (1 &lt; 2) 1 <span style="color: #a020f0;">else</span> 1.0
+</pre>
+</div>
+
+<pre class="example">
+{Comparable&lt;*&gt; &amp; Number} = 1
+</pre>
+
+
+<p>
+Wenn der Wert des <code>if</code> Ausdrucks verwendet wird, muss der <code>else</code> Zweig
+immer vorhanden sein.
+</p>
+<div class="org-src-container">
+<pre class="src src-kotlin"><span style="color: #a020f0;">val</span> <span style="color: #a0522d;">aValue</span> = <span style="color: #a020f0;">if</span> (1 &lt; 2) 5 <span style="color: #a020f0;">else</span> 4 <span style="color: #b22222;">// </span><span style="color: #b22222;">OK</span>
+aValue = <span style="color: #a020f0;">if</span> (1 &lt; 2) 5 <span style="color: #b22222;">// </span><span style="color: #b22222;">Fehler</span>
+</pre>
 </div>
 </div>
+</div>
+
+<div id="outline-container-orgb323da5" class="outline-4">
+<h4 id="orgb323da5">When Anweisung/Ausdruck</h4>
+<div class="outline-text-4" id="text-orgb323da5">
+<p>
+Ein <code>when</code> Ausdruck ähnelt der <code>switch</code> Anweisung wie man sie aus Java
+kennt. Analog dazu werden in einem <code>when</code> Ausdruck die angegebenen
+Bedingungen in der Reihenfolge ihres Auftretens geprüft und der Zweig
+der Bedingung ausgeführt, die als erste zu <code>true</code> evaluiert wird. Der
+optionale <code>else</code> Zweig wird ausgeführt, falls keine der Bedingungen
+zutrifft. Der <code>else</code> Zweig muss zwingend angegeben werden, wenn <code>when</code>
+als Ausdruck verwendet wird und der Compiler nicht erkennen kann, dass
+eine der Bedingungen zutreffen muss, was z.B. bei der Prüfung auf
+<code>Enum</code> der Fall sein kann.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-kotlin"><span style="color: #a020f0;">val</span> <span style="color: #a0522d;">x</span> = 5
+<span style="color: #a020f0;">val</span> <span style="color: #a0522d;">y</span> = 4
+<span style="color: #b22222;">// </span><span style="color: #b22222;">Verwendung als Ausdruck:</span>
+<span style="color: #a020f0;">val</span> <span style="color: #a0522d;">result</span> = 
+<span style="color: #a020f0;">when</span> (x) {
+  1    -&gt; <span style="color: #8b2252;">"ist eins"</span>
+  2, 3 -&gt; <span style="color: #8b2252;">"ist zwei oder drei"</span>
+  y + 1 -&gt; <span style="color: #8b2252;">"eins mehr als y"</span> <span style="color: #b22222;">// </span><span style="color: #b22222;">Bedingung kann Ausdruck sein</span>
+  <span style="color: #a020f0;">else</span> -&gt; <span style="color: #8b2252;">"wei&#223; nicht"</span> <span style="color: #b22222;">// </span><span style="color: #b22222;">else zwingend wegen Nutzung als Ausdruck</span>
+}
+result
+</pre>
+</div>
+
+<pre class="example">
+kotlin.String = eins mehr als y
+</pre>
+
+
+<p>
+Die Bedingungen in dem <code>when</code> Ausdruck können auch recht komplex sein:
+</p>
+<div class="org-src-container">
+<pre class="src src-kotlin"><span style="color: #a020f0;">val</span> <span style="color: #a0522d;">x</span> = 5
+<span style="color: #a020f0;">when</span> (x) {
+  <span style="color: #a020f0;">in</span> 1..10 -&gt; println(<span style="color: #8b2252;">"in range"</span>)
+  !<span style="color: #a020f0;">in</span> 10..20 -&gt; println(<span style="color: #8b2252;">"out of range"</span>)
+  <span style="color: #a020f0;">is</span> <span style="color: #228b22;">Number</span> -&gt; println(<span style="color: #8b2252;">"ist vom Typ String"</span>) <span style="color: #b22222;">// </span><span style="color: #b22222;">Typ muss zuweisungskompatibel mit x sein</span>
+  <span style="color: #b22222;">// </span><span style="color: #b22222;">hier lassen wir else mal weg, was aber schlechter Stil ist</span>
+}
+</pre>
+</div>
+
+<pre class="example">
+in range
+</pre>
+
+
+<p>
+Der <code>when</code> Ausdruck lässt sich auch ohne Eingabewert verwenden und
+stellt damit ein mächtigeres <code>if</code> Konstrukt zur Verfügung:
+</p>
+<div class="org-src-container">
+<pre class="src src-kotlin"><span style="color: #a020f0;">val</span> <span style="color: #a0522d;">x</span> = 5
+<span style="color: #a020f0;">val</span> <span style="color: #a0522d;">y</span> = 3
+<span style="color: #a020f0;">when</span> {
+  x &gt; 4 -&gt; <span style="color: #8b2252;">"x gr&#246;&#223;er 4"</span>
+  y &lt; 4 -&gt; <span style="color: #8b2252;">"y kleiner 4"</span>
+  <span style="color: #a020f0;">else</span> -&gt; <span style="color: #8b2252;">"wei&#223; nicht"</span>
+}
+</pre>
+</div>
+
+<pre class="example">
+kotlin.String = x größer 4
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+
 
 <div id="outline-container-org77d0243" class="outline-2">
 <h2 id="org77d0243">Grundkonstruktion von Programmen</h2>
@@ -1118,7 +1248,7 @@ testFun(42)
 </div>
 
 <pre class="example">
-val Line_52.testFun: (kotlin.Int) -&gt; kotlin.Unit
+val Line_34.testFun: (kotlin.Int) -&gt; kotlin.Unit
 Testwert: 42
 </pre>
 
@@ -1142,7 +1272,7 @@ toInt(<span style="color: #8b2252;">"1"</span>)
 </div>
 
 <pre class="example">
-val Line_54.toInt: (kotlin.String) -&gt; kotlin.Int
+val Line_36.toInt: (kotlin.String) -&gt; kotlin.Int
 kotlin.Int = 1
 </pre></li>
 
@@ -1277,8 +1407,8 @@ Objects. Auch diese müssen bei Deklaration initialisiert werden.
 </div>
 </div>
 
-<div id="outline-container-org7040771" class="outline-4">
-<h4 id="org7040771">Interfaces</h4>
+<div id="outline-container-orgcb78b13" class="outline-4">
+<h4 id="orgcb78b13">Interfaces</h4>
 </div>
 
 <div id="outline-container-org2b43337" class="outline-4">
@@ -1550,9 +1680,9 @@ Einige Regeln zur Vererbung erläutern wir in dem folgenden Beispiel.
 </div>
 </div>
 
-<div id="outline-container-orgcb78b13" class="outline-5">
-<h5 id="orgcb78b13">Interfaces</h5>
-<div class="outline-text-5" id="text-orgcb78b13">
+<div id="outline-container-orgfaca239" class="outline-5">
+<h5 id="orgfaca239">Interfaces</h5>
+<div class="outline-text-5" id="text-orgfaca239">
 <p>
 Interfaces in Kotlin können Member Funktionen deklarieren als auch
 implementieren. Im ersten Fall ist die Funktion dann abstrakt markiert
@@ -1664,6 +1794,51 @@ Beispiele sind unten angegeben:
 }
 </pre>
 </div>
+</div>
+</div>
+
+<div id="outline-container-orgd56f6ee" class="outline-5">
+<h5 id="orgd56f6ee">Data Klassen</h5>
+<div class="outline-text-5" id="text-orgd56f6ee">
+<p>
+In Anwendungsfällen wie z.B. Datentransferobjekte (DTO) benötigt
+man eine Klasse nur, um Daten zu transportieren, aber Logik muss
+in der Klasse so gut wie gar nicht untergebracht werden. Daher
+gibt es in Kotlin die <code>data classes</code>, die im <code>primary
+     constructor</code> die Properties der Klasse aufführen, für die dann
+automatisiert Code für <code>toString()</code>, <code>equals()</code>, <code>hashCode()</code>,
+<code>copy()</code> und die Komponenten Funktionen für die Unterstützung von
+Destructuring Declarations erzeugt wird.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-kotlin"><span style="color: #a020f0;">data</span> <span style="color: #a020f0;">class</span> <span style="color: #228b22;">MyData</span>(<span style="color: #a020f0;">val</span> <span style="color: #a0522d;">aMember</span> : <span style="color: #228b22;">Int</span>, <span style="color: #a020f0;">val</span> <span style="color: #a0522d;">bMember</span> : <span style="color: #228b22;">Double</span>)
+<span style="color: #a020f0;">val</span> <span style="color: #a0522d;">myData</span> = <span style="color: #228b22;">MyData</span>(4,45.0)
+println(myData) <span style="color: #b22222;">// </span><span style="color: #b22222;">hier greift die erzeugte toString() Methode</span>
+</pre>
+</div>
+
+<pre class="example">
+MyData(aMember=4, bMember=45.0)
+</pre>
+
+
+<p>
+Eine <code>copy()</code> Funktion kann genutzt werden, um in sehr kurzer Form
+eine Kopie eines bestehenden Objekts anzulegen und bei Bedard dabei wenige
+Properties zu ändern.
+</p>
+<div class="org-src-container">
+<pre class="src src-kotlin"><span style="color: #a020f0;">data</span> <span style="color: #a020f0;">class</span> <span style="color: #228b22;">MyData</span>(<span style="color: #a020f0;">val</span> <span style="color: #a0522d;">aMember</span> : <span style="color: #228b22;">Int</span>, <span style="color: #a020f0;">val</span> <span style="color: #a0522d;">bMember</span> : <span style="color: #228b22;">Double</span>)
+<span style="color: #a020f0;">val</span> <span style="color: #a0522d;">objMyData</span> = <span style="color: #228b22;">MyData</span>(4, 4.5)
+<span style="color: #a020f0;">val</span> <span style="color: #a0522d;">copiedMyData</span> = objMyData.copy(bMember = 5.5)
+println(copiedMyData)
+</pre>
+</div>
+
+<pre class="example">
+MyData(aMember=4, bMember=5.5)
+</pre>
 </div>
 </div>
 </div>
@@ -1815,7 +1990,7 @@ verwendet.</li>
 </div>
 <div id="postamble" class="status">
 <p class="author">Autor: Reinhard Braumandl</p>
-<p class="date">Created: 2021-04-18 So 16:25</p>
+<p class="date">Created: 2021-05-01 Sa 16:22</p>
 <p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
 </body>
